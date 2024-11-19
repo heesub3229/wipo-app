@@ -1,23 +1,27 @@
-import logo from "./logo.svg";
 import "./App.css";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Login from "./pages/accounts/Login";
+import Signup from "./pages/accounts/Signup";
+import FindId from "./pages/accounts/FindId";
+import FindPw from "./pages/accounts/FindPw";
+import ResetPw from "./pages/accounts/ResetPw";
+import Main from "./pages/main/Main";
+import FirstLogin from "./pages/accounts/FirstLogin";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          우하하
-        </a>
-      </header>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/Signup" element={<Signup />} />
+          <Route path="/FindId" element={<FindId />} />
+          <Route path="/FindPW" element={<FindPw />} />
+          <Route path="/ResetPW" element={<ResetPw />} />
+          <Route path="/FirstLogin" element={<FirstLogin />} />
+          <Route path="/Main" element={<Main />} />
+        </Routes>
+      </Router>
     </div>
   );
 }
