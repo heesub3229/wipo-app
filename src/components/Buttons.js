@@ -32,7 +32,10 @@ export const SideFilledButton = ({
   handleClick,
 }) => {
   return (
-    <button className="h-10 font-nanum font-semibold flex items-center justify-center rounded-md text-white bg-indigo-400 hover:bg-indigo-500 w-full">
+    <button
+      className="h-10 font-nanum font-semibold flex items-center justify-center rounded-md text-white bg-indigo-400 hover:bg-indigo-500 w-full"
+      onClick={() => handleClick()}
+    >
       {StartIcon && <StartIcon className="mr-2" />}
       {text}
     </button>
@@ -46,10 +49,42 @@ export const SideButton = ({
   handleClick,
 }) => {
   return (
-    <button className="h-10 px-2 font-nanum font-semibold flex items-center rounded-md hover:bg-gray-50 w-full">
+    <button
+      className="h-10 px-2 font-nanum font-semibold flex items-center rounded-md hover:bg-gray-50 w-full"
+      onClick={() => handleClick()}
+    >
       {StartIcon && <StartIcon className="mr-2" />}
       {text}
       {EndIcon && <EndIcon className="ml-2" />}
     </button>
+  );
+};
+
+export const SideBottomButton = ({
+  text,
+  startIcon: StartIcon,
+  endIcon: EndIcon,
+  handleClick,
+}) => {
+  return (
+    <button
+      className="h-10 px-2 text-sm font-nanum font-semibold flex items-center rounded-md hover:bg-gray-50 w-full"
+      onClick={() => handleClick()}
+    >
+      {StartIcon && <StartIcon className="mr-2" />}
+      {text}
+      {EndIcon && <EndIcon className="ml-2" />}
+    </button>
+  );
+};
+
+export const IconButton = ({ icon: Icon, handleClick }) => {
+  return (
+    <div
+      className="p-2 rounded-full hover:bg-calendarHover flex justify-center items-center text-xl text-gray-600 mr-4 cursor-pointer"
+      onClick={handleClick}
+    >
+      <Icon />
+    </div>
   );
 };

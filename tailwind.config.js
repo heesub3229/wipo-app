@@ -12,11 +12,22 @@ module.exports = {
         "1/10": "10%",
       },
       height: {
-        header: "7vh",
+        "7vh": "7vh",
+        "20vh": "20vh",
+        "80vh": "80vh",
         "1/20": "5%",
+        "1/15": "6%",
       },
       colors: {
         back: "#F7F7FA",
+        calendar: "#FBFBFE",
+        calendarHover: "#F1F2F9",
+      },
+      margin: {
+        "7vh": "7vh",
+      },
+      padding: {
+        "7vh": "7vh",
       },
     },
   },
