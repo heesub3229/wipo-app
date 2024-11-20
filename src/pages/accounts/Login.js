@@ -12,8 +12,17 @@ import Logo from "../../images/accounts/Logo.png";
 import Kakao from "../../images/accounts/Kakao.png";
 import Naver from "../../images/accounts/Naver.png";
 import Google from "../../images/accounts/Google.png";
+import { generateState } from "../../components/Util";
+import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 
 export default function Login() {
+  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+  const KakaoApiKey = process.env.REACT_APP_KAKAO_API;
+
+  const kakaoRectUrl = process.env.REACT_APP_KAKAO_REDIRECT_URL;
+
+  const naverClientId = process.env.REACT_APP_NAVER_CLIENT_ID;
+  const naverRedirectUri = process.env.REACT_APP_NAVER_REDIRECT_URL;
   const navigate = useNavigate();
   const [showPwFlag, setShowPwFlag] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
@@ -51,9 +60,16 @@ export default function Login() {
     navigate("/FindPw");
   };
 
-  const handleKakaoLogin = () => {};
+  const handleKakaoLogin = () => {
+    const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${KakaoApiKey}&redirect_uri=${kakaoRectUrl}&response_type=code`;
 
-  const handleNaverLogin = () => {};
+    window.location.href = kakaoURL;
+  };
+
+  const handleNaverLogin = () => {
+    // const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverClientId}&redirect_uri=${naverRedirectUri}&state=${generateState()}`;
+    // window.location.href = naverAuthUrl;
+  };
 
   const handleGoogleLogin = () => {};
 

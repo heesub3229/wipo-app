@@ -5,8 +5,8 @@ import Signup from "./pages/accounts/Signup";
 import FindId from "./pages/accounts/FindId";
 import FindPw from "./pages/accounts/FindPw";
 import ResetPw from "./pages/accounts/ResetPw";
-import Main from "./pages/main/Main";
 import FirstLogin from "./pages/accounts/FirstLogin";
+import { KakaoLogin } from "./components/LoginIng";
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
           <Route path="/FindPW" element={<FindPw />} />
           <Route path="/ResetPW" element={<ResetPw />} />
           <Route path="/FirstLogin" element={<FirstLogin />} />
-          <Route path="/Main" element={<Main />} />
+          <Route path="/Kakao" element={<KakaoLogin />} />
         </Routes>
       </Router>
     </div>
