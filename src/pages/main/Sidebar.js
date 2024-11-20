@@ -32,15 +32,16 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     navigate("/");
   };
   return (
-    <div
-      className={` fixed inset-0 bg-black bg-opacity-30 transition-opacity duration-500 ease-in-out ${
-        isOpen ? "opacity-100 visible " : "opacity-0 invisible"
-      }`}
-      onClick={(e) => {
-        e.stopPropagation();
-        setIsOpen(false);
-      }}
-    >
+    <>
+      <div
+        className={` fixed inset-0 bg-black bg-opacity-30 transition-opacity duration-500 ease-in-out ${
+          isOpen ? "opacity-100 visible " : "opacity-0 invisible"
+        }`}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(false);
+        }}
+      ></div>
       <div
         className={`fixed top-0 left-0 px-4 pt-10 pb-4 h-screen z-50 w-1/8 bg-white flex flex-col transform transition-all duration-500 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
@@ -93,6 +94,6 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           handleClick={handleLogoutClick}
         />
       </div>
-    </div>
+    </>
   );
 }
