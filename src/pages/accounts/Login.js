@@ -23,6 +23,7 @@ export default function Login() {
 
   const naverClientId = process.env.REACT_APP_NAVER_CLIENT_ID;
   const naverRedirectUri = process.env.REACT_APP_NAVER_REDIRECT_URL;
+  const googleRedirectUri = process.env.REACT_APP_GOOGLE_REDIRECT_URL;
   const navigate = useNavigate();
   const [showPwFlag, setShowPwFlag] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
@@ -72,7 +73,7 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
-    const googleUri = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&prompt=consent&client_id=${googleClientId}&redirect_uri=http://localhost:3000/google&scope=https://www.googleapis.com/auth/userinfo.email%20https://www.googleapis.com/auth/userinfo.profile%20openid&access_type=offline&state=${generateState()}`;
+    const googleUri = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&prompt=consent&client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&scope=https://www.googleapis.com/auth/userinfo.email%20https://www.googleapis.com/auth/userinfo.profile%20openid&access_type=offline&state=${generateState()}`;
     window.location.href = googleUri;
   };
 
