@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Lodaing } from "./Common";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { setToken } from "../slices/auth";
 
 export const KakaoLogin = () => {
   const serverUrl = process.env.REACT_APP_SERVER_API;
