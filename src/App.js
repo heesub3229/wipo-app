@@ -1,5 +1,10 @@
 import "./App.css";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  BrowserRouter,
+} from "react-router-dom";
 import Login from "./pages/accounts/Login";
 import Signup from "./pages/accounts/Signup";
 import FindId from "./pages/accounts/FindId";
@@ -7,11 +12,13 @@ import FindPw from "./pages/accounts/FindPw";
 import ResetPw from "./pages/accounts/ResetPw";
 import FirstLogin from "./pages/accounts/FirstLogin";
 import { KakaoLogin } from "./components/LoginIng";
+import { Provider } from "react-redux";
+import store from "./slices/store";
 
 function App() {
   return (
-    <div className="App">
-      <Router>
+    <Provider store={store}>
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/Signup" element={<Signup />} />
@@ -21,8 +28,8 @@ function App() {
           <Route path="/FirstLogin" element={<FirstLogin />} />
           <Route path="/Kakao" element={<KakaoLogin />} />
         </Routes>
-      </Router>
-    </div>
+      </BrowserRouter>
+    </Provider>
   );
 }
 
