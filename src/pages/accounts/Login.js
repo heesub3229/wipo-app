@@ -67,11 +67,14 @@ export default function Login() {
   };
 
   const handleNaverLogin = () => {
-    // const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverClientId}&redirect_uri=${naverRedirectUri}&state=${generateState()}`;
-    // window.location.href = naverAuthUrl;
+    const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverClientId}&redirect_uri=${naverRedirectUri}&state=${generateState()}`;
+    window.location.href = naverAuthUrl;
   };
 
-  const handleGoogleLogin = () => {};
+  const handleGoogleLogin = () => {
+    const googleUri = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&prompt=consent&client_id=${googleClientId}&redirect_uri=http://localhost:3000/google&scope=https://www.googleapis.com/auth/userinfo.email%20https://www.googleapis.com/auth/userinfo.profile%20openid&access_type=offline&state=${generateState()}`;
+    window.location.href = googleUri;
+  };
 
   const handleSubmit = () => {
     const isValidEmail = validateEmail(email);
