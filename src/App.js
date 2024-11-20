@@ -1,10 +1,5 @@
 import "./App.css";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  BrowserRouter,
-} from "react-router-dom";
+import { Route, Routes, BrowserRouter } from "react-router-dom";
 import Login from "./pages/accounts/Login";
 import Signup from "./pages/accounts/Signup";
 import FindId from "./pages/accounts/FindId";
