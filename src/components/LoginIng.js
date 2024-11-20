@@ -12,7 +12,9 @@ export const KakaoLogin = () => {
   const code = new URL(window.location.href).searchParams.get("code");
   useEffect(() => {
     const kakaoAuth = async () => {
-      const response = await axios.get(`${serverUrl}/user/kakaoLogin?code=123`);
+      const response = await axios.get(
+        `${serverUrl}/user/kakaoLogin?code=${code}`
+      );
 
       const res = await response.data;
       if (res) {
