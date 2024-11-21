@@ -6,9 +6,10 @@ import FindId from "./pages/accounts/FindId";
 import FindPw from "./pages/accounts/FindPw";
 import ResetPw from "./pages/accounts/ResetPw";
 import FirstLogin from "./pages/accounts/FirstLogin";
-import { KakaoLogin } from "./components/LoginIng";
+import { GoogleLogin, KakaoLogin, NaverLogin } from "./components/LoginIng";
 import { Provider } from "react-redux";
 import store from "./slices/store";
+import Main from "./pages/main/Main";
 
 function App() {
   return (
@@ -22,6 +23,9 @@ function App() {
           <Route path="/ResetPW" element={<ResetPw />} />
           <Route path="/FirstLogin" element={<FirstLogin />} />
           <Route path="/Kakao" element={<KakaoLogin />} />
+          <Route path="/naver" element={<NaverLogin />} />
+          <Route path="/google" element={<GoogleLogin />} />
+          <Route path="/Main" element={<Main />} />
         </Routes>
       </BrowserRouter>
     </Provider>
