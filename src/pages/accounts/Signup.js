@@ -2,9 +2,17 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AccountTitle, AccountText } from "../../components/Typography";
-import { LoginInput } from "../../components/TextField";
+import {
+  LoginInput,
+  LoginVerInput,
+  VerCodeInput,
+} from "../../components/TextField";
 import { LoginDropDown } from "../../components/DropDown";
-import { AccountButton } from "../../components/Buttons";
+import {
+  AccountButton,
+  FilledButton,
+  OutlinedButton,
+} from "../../components/Buttons";
 import { CheckboxS } from "../../components/Checkbox";
 import { Modal } from "../../components/Modal";
 import PrivacyPolicy from "./PrivacyPolicy";
@@ -17,11 +25,15 @@ import {
   FiEyeOff,
   FiCalendar,
 } from "react-icons/fi";
+import { FaExclamation, FaCheck } from "react-icons/fa6";
 import LoginBack from "../../images/accounts/LoginBack.png";
 import Logo from "../../images/accounts/Logo.png";
+import { VerifyTimer } from "../../components/Timer";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const [verCnt, setVerCnt] = useState(0);
+  const [isVerified, setIsVerified] = useState(false);
   const [showPwFlag, setShowPwFlag] = useState(false);
   const [showCkPwFlag, setShowCkPwFlag] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
@@ -84,6 +96,15 @@ export default function Signup() {
     } else {
       setPwMissMatch(false);
     }
+  };
+
+  const handleSendMail = () => {
+    setVerCnt((prev) => prev + 1);
+  };
+
+  const handleClickVerify = () => {
+    // 인증 되면
+    setIsVerified(true);
   };
 
   const handlePwShowClick = () => {
@@ -189,13 +210,35 @@ export default function Signup() {
             startIcon={FiUser}
             errFlag={nameErrFlag}
           />
-          <LoginInput
+          <LoginVerInput
             id="email"
             placeholder="Email"
             handleInputChange={handleEmailChange}
             startIcon={FiMail}
+            clickVerify={handleSendMail}
             errFlag={emailErrFlag}
           />
+          {isVerified ? (
+            <div className="flex items-center font-nanum text-sm text-green-600 space-x-2">
+              <FaCheck />
+              <p>인증이 완료되었습니다.</p>
+            </div>
+          ) : (
+            <div className="flex items-center font-nanum text-sm text-red-600 space-x-1">
+              <FaExclamation />
+              <p>이메일 인증을 진행해주세요.</p>
+            </div>
+          )}
+          {verCnt > 0 && !isVerified && (
+            <div className="my-5">
+              <VerCodeInput />
+              <VerifyTimer expTime="2024-11-21T16:28:27.4655229" />
+              <div className="w-full flex space-x-4">
+                <OutlinedButton text="재전송" handleClick={handleSendMail} />
+                <FilledButton text="인증하기" handleClick={handleClickVerify} />
+              </div>
+            </div>
+          )}
           <LoginInput
             id="password"
             placeholder="Password"

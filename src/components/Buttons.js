@@ -12,6 +12,32 @@ export const AccountButton = ({ text, handleClick }) => {
   );
 };
 
+export const FilledButton = ({ text, handleClick }) => {
+  return (
+    <button
+      className="font-nanum font-semibold w-full p-2 mt-4 rounded-md bg-indigo-400 hover:bg-indigo-500 text-white"
+      onClick={() => {
+        handleClick();
+      }}
+    >
+      {text}
+    </button>
+  );
+};
+
+export const OutlinedButton = ({ text, handleClick }) => {
+  return (
+    <button
+      className="font-nanum font-semibold w-full p-2 mt-4 rounded-md hover:bg-indigo-100 border-2 border-indigo-400 text-indigo-800"
+      onClick={() => {
+        handleClick();
+      }}
+    >
+      {text}
+    </button>
+  );
+};
+
 export const TextButton = ({ text, endIcon: EndIcon, handleClick }) => {
   return (
     <button
@@ -86,5 +112,18 @@ export const IconButton = ({ icon: Icon, handleClick }) => {
     >
       <Icon />
     </div>
+  );
+};
+
+export const VerifyButton = ({ text, handleClick }) => {
+  return (
+    <button
+      className="font-nanum font-semibold p-2 mt-2 rounded-md hover:bg-indigo-50"
+      onClick={() => {
+        handleClick();
+      }}
+    >
+      {text}
+    </button>
   );
 };

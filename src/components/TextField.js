@@ -36,6 +36,44 @@ export const LoginInput = ({
   );
 };
 
+export const LoginVerInput = ({
+  id,
+  value,
+  placeholder,
+  type,
+  handleInputChange,
+  startIcon: StartIcon,
+  endIcon: EndIcon,
+  clickVerify,
+  errFlag,
+}) => {
+  return (
+    <div
+      className={`flex items-center mt-3 bg-white w-full p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none ${
+        errFlag ? "border-red-600" : "border-gray-300"
+      }`}
+    >
+      {StartIcon && <StartIcon className="text-gray-400 mr-2" />}
+      <input
+        className="w-full focus:outline-none font-nanum text-sm"
+        type={type ? type : "text"}
+        id={id}
+        value={value}
+        onChange={(e) => handleInputChange(e.target.value)}
+        placeholder={placeholder}
+      />
+      <div
+        className="hover:bg-gray-100 rounded-md px-2 cursor-pointer"
+        onClick={() => {
+          clickVerify();
+        }}
+      >
+        <p className="font-nanum text-sm whitespace-nowrap">인증번호 전송</p>
+      </div>
+    </div>
+  );
+};
+
 export const VerCodeInput = () => {
   const inputRefs = useRef([]);
 
