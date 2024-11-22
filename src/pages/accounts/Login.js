@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AccountTitle, AccountText } from "../../components/Typography";
@@ -14,6 +14,8 @@ import Naver from "../../images/accounts/Naver.png";
 import Google from "../../images/accounts/Google.png";
 import { generateState } from "../../components/Util";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
+import { useDispatch, useSelector } from "react-redux";
+import { cookieSave, removeCookie } from "../../slices/cookie";
 
 export default function Login() {
   const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -25,15 +27,31 @@ export default function Login() {
   const naverRedirectUri = process.env.REACT_APP_NAVER_REDIRECT_URL;
   const googleRedirectUri = process.env.REACT_APP_GOOGLE_REDIRECT_URL;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const cookie = useSelector((state) => state.cookie.cookie);
   const [showPwFlag, setShowPwFlag] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-  const [email, setEmail] = useState("");
+  const [isChecked, setIsChecked] = useState(
+    cookie["wipoEmail"] ? true : false
+  );
+  const [email, setEmail] = useState(cookie["wipoEmail"] || "");
   const [password, setPassword] = useState("");
   const [emailErrFlag, setEmailErrFlag] = useState(false);
   const [pwErrFlag, setPwErrFlag] = useState(false);
+
   const handleEmailChange = (value) => {
     setEmail(value);
     setEmailErrFlag(false);
+    if (isChecked) {
+      dispatch(
+        cookieSave({
+          key: "wipoEmail",
+          value: value,
+          options: { maxAge: 30 * 24 * 60 * 60 },
+        })
+      );
+    } else {
+      dispatch(removeCookie({ key: "wipoEmail" }));
+    }
   };
 
   const handlePasswordChange = (value) => {
@@ -45,7 +63,19 @@ export default function Login() {
     setShowPwFlag((prev) => !prev);
   };
 
-  const handleCheckboxChange = () => {
+  const handleCheckboxChange = (event) => {
+    const target = event.target.checked;
+    if (target) {
+      dispatch(
+        cookieSave({
+          key: "wipoEmail",
+          value: email,
+          options: { maxAge: 30 * 24 * 60 * 60 },
+        })
+      );
+    } else {
+      dispatch(removeCookie({ key: "wipoEmail" }));
+    }
     setIsChecked((prev) => !prev);
   };
 
@@ -119,6 +149,7 @@ export default function Login() {
           <LoginInput
             id="email"
             placeholder="Email"
+            value={email}
             handleInputChange={handleEmailChange}
             startIcon={FiUser}
             errFlag={emailErrFlag}

@@ -29,6 +29,9 @@ import { FaExclamation, FaCheck } from "react-icons/fa6";
 import LoginBack from "../../images/accounts/LoginBack.png";
 import Logo from "../../images/accounts/Logo.png";
 import { VerifyTimer } from "../../components/Timer";
+import { useDispatch, useSelector } from "react-redux";
+import { emailAuth, emailValid } from "../../api/UserApi";
+import { clearState } from "../../slices/api";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -53,6 +56,16 @@ export default function Signup() {
   const [monthErrFlag, setMonthErrFlag] = useState(false);
   const [dateErrFlag, setDateErrFlag] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [code, setCode] = useState("");
+  const dispatch = useDispatch();
+  const emailValidState = useSelector((state) => state.api.emailValid);
+
+  useEffect(() => {
+    if (emailValidState?.data === false) {
+      setIsVerified(true);
+      dispatch(clearState());
+    }
+  }, [emailValidState]);
 
   useEffect(() => {
     if (year) {
@@ -99,12 +112,13 @@ export default function Signup() {
   };
 
   const handleSendMail = () => {
+    dispatch(emailAuth(email));
     setVerCnt((prev) => prev + 1);
   };
 
   const handleClickVerify = () => {
     // 인증 되면
-    setIsVerified(true);
+    dispatch(emailValid({ email: email, code: code }));
   };
 
   const handlePwShowClick = () => {
@@ -187,6 +201,10 @@ export default function Signup() {
     return pattern.test(value);
   };
 
+  const emailCodeTxt = (value) => {
+    setCode(String(value));
+  };
+
   return (
     <div
       className="min-h-screen w-screen bg-center bg-contain bg-no-repeat flex justify-center items-center"
@@ -231,8 +249,8 @@ export default function Signup() {
           )}
           {verCnt > 0 && !isVerified && (
             <div className="my-5">
-              <VerCodeInput />
-              <VerifyTimer expTime="2024-11-21T16:28:27.4655229" />
+              <VerCodeInput text={emailCodeTxt} />
+              <VerifyTimer />
               <div className="w-full flex space-x-4">
                 <OutlinedButton text="재전송" handleClick={handleSendMail} />
                 <FilledButton text="인증하기" handleClick={handleClickVerify} />

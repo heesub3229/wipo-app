@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export const LoginInput = ({
   id,
@@ -74,40 +74,51 @@ export const LoginVerInput = ({
   );
 };
 
-export const VerCodeInput = () => {
+export const VerCodeInput = ({ text }) => {
   const inputRefs = useRef([]);
+  const [inputs, setInputs] = useState(Array(4).fill(""));
 
   const handleChange = (e, index) => {
     const value = e.target.value;
 
     if (/^\d$/.test(value)) {
+      const newInputs = [...inputs];
+      newInputs[index] = value;
+      setInputs(newInputs);
+
       if (index < inputRefs.current.length - 1) {
         inputRefs.current[index + 1].focus();
       }
     } else {
-      e.target.value = "";
+      e.target.value = ""; // 잘못된 입력 제거
     }
   };
 
-  const inputs = Array(4)
-    .fill(0)
-    .map((_, index) => (
-      <input
-        key={index}
-        ref={(el) => (inputRefs.current[index] = el)}
-        className="bg-white h-20 p-3 w-1/6 border rounded-md border-gray-300 ring-gray-600 focus:ring-2 focus:ring-gray-500 focus:outline-none font-nanum text-5xl text-center caret-transparent"
-        placeholder="0"
-        maxLength="1"
-        onChange={(e) => handleChange(e, index)}
-        onKeyDown={(e) => {
-          if (e.key === "Backspace" && index > 0 && !e.target.value) {
-            inputRefs.current[index - 1].focus();
-          }
-        }}
-      />
-    ));
+  useEffect(() => {
+    // 모든 입력값이 변경될 때 부모로 전달
+    text(inputs.join(""));
+  }, [inputs]);
 
-  return <div className="flex justify-around">{inputs}</div>;
+  return (
+    <div className="flex justify-around">
+      {inputs.map((_, index) => (
+        <input
+          key={index}
+          ref={(el) => (inputRefs.current[index] = el)}
+          className="bg-white h-20 p-3 w-1/6 border rounded-md border-gray-300 ring-gray-600 focus:ring-2 focus:ring-gray-500 focus:outline-none font-nanum text-5xl text-center caret-transparent"
+          placeholder="0"
+          maxLength="1"
+          value={inputs[index]} // 상태로 입력값 관리
+          onChange={(e) => handleChange(e, index)}
+          onKeyDown={(e) => {
+            if (e.key === "Backspace" && index > 0 && !e.target.value) {
+              inputRefs.current[index - 1].focus();
+            }
+          }}
+        />
+      ))}
+    </div>
+  );
 };
 
 export const UnderLineInput = ({
