@@ -30,107 +30,115 @@ import LoginBack from "../../images/accounts/LoginBack.png";
 import Logo from "../../images/accounts/Logo.png";
 import { VerifyTimer } from "../../components/Timer";
 import { useDispatch, useSelector } from "react-redux";
-import { emailAuth, emailValid } from "../../api/UserApi";
+import { emailAuth, emailValid, asign } from "../../api/UserApi";
 import { clearState } from "../../slices/api";
+import { addField, resetField } from "../../slices/field";
+
+const key = "Signup";
 
 export default function Signup() {
   const navigate = useNavigate();
   const [verCnt, setVerCnt] = useState(0);
-  const [isVerified, setIsVerified] = useState(false);
-  const [showPwFlag, setShowPwFlag] = useState(false);
-  const [showCkPwFlag, setShowCkPwFlag] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [chkPassword, setChkPassword] = useState("");
-  const [year, setYear] = useState("");
-  const [month, setMonth] = useState("");
-  const [date, setDate] = useState("");
-  const [nameErrFlag, setNameErrFlag] = useState(false);
-  const [emailErrFlag, setEmailErrFlag] = useState(false);
-  const [pwErrFlag, setPwErrFlag] = useState(false);
-  const [chkPwErrFlag, setChkPwErrFlag] = useState(false);
-  const [pwMissMatch, setPwMissMatch] = useState(false);
-  const [yearErrFlag, setYearErrFlag] = useState(false);
-  const [monthErrFlag, setMonthErrFlag] = useState(false);
-  const [dateErrFlag, setDateErrFlag] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
-  const [code, setCode] = useState("");
   const dispatch = useDispatch();
+  dispatch(resetField());
   const emailValidState = useSelector((state) => state.api.emailValid);
+  const asignState = useSelector((state) => state.api.asign);
+  const fieldState = useSelector((state) => state.field[key] || {});
+  const pushFieldData = (fieldName, value) => {
+    dispatch(addField({ key: key, fieldName: fieldName, value: value }));
+  };
 
   useEffect(() => {
     if (emailValidState?.data === false) {
-      setIsVerified(true);
+      pushFieldData("isVerified", true);
       dispatch(clearState());
     }
   }, [emailValidState]);
 
   useEffect(() => {
-    if (year) {
-      setYearErrFlag(false);
+    if (asignState?.data !== null) {
+      if (asignState?.data === false) {
+        navigate("/");
+      }
+    }
+  }, [asignState]);
+
+  useEffect(() => {
+    if (fieldState["year"]) {
+      pushFieldData("yearErrFlag", false);
     }
 
-    if (month) {
-      setMonthErrFlag(false);
+    if (fieldState["month"]) {
+      pushFieldData("monthErrFlag", false);
     }
 
-    if (date) {
-      setDateErrFlag(false);
+    if (fieldState["date"]) {
+      pushFieldData("dateErrFlag", false);
     }
-  }, [year, month, date]);
+  }, [fieldState]);
   const handleNameChange = (value) => {
-    setName(value);
-    setNameErrFlag(false);
+    pushFieldData("name", value);
+    pushFieldData("nameErrFlag", false);
   };
 
   const handleEmailChange = (value) => {
-    setEmail(value);
-    setEmailErrFlag(false);
+    pushFieldData("email", value);
+    pushFieldData("emailErrFlag", false);
   };
 
   const handlePasswordChange = (value) => {
-    setPassword(value);
-    setPwErrFlag(false);
-    if (value !== chkPassword) {
-      setPwMissMatch(true);
+    pushFieldData("password", value);
+    pushFieldData("pwErrFlag", false);
+    if (fieldState["chkPassword"] && value !== fieldState["chkPassword"]) {
+      pushFieldData("pwMissMatch", true);
     } else {
-      setPwMissMatch(false);
+      pushFieldData("pwMissMatch", false);
     }
   };
 
   const handleChkPasswordChange = (value) => {
-    setChkPassword(value);
-    setChkPwErrFlag(false);
+    pushFieldData("chkPassword", value);
+    pushFieldData("chkPwErrFlag", false);
 
-    if (value !== password) {
-      setPwMissMatch(true);
+    if (fieldState["password"] && value !== fieldState["password"]) {
+      pushFieldData("pwMissMatch", true);
     } else {
-      setPwMissMatch(false);
+      pushFieldData("pwMissMatch", false);
     }
   };
 
   const handleSendMail = () => {
-    dispatch(emailAuth(email));
-    setVerCnt((prev) => prev + 1);
+    if (fieldState["email"]) {
+      dispatch(emailAuth(fieldState["email"]));
+      setVerCnt((prev) => prev + 1);
+    }
   };
 
   const handleClickVerify = () => {
     // 인증 되면
-    dispatch(emailValid({ email: email, code: code }));
+    if (fieldState["email"] && fieldState["code"]) {
+      dispatch(
+        emailValid({ email: fieldState["email"], code: fieldState["code"] })
+      );
+    }
   };
 
   const handlePwShowClick = () => {
-    setShowPwFlag((prev) => !prev);
+    if (fieldState["showPwFlag"]) {
+      pushFieldData("showPwFlag", !fieldState["showPwFlag"]);
+    }
   };
 
   const handleCkPwShowClick = () => {
-    setShowCkPwFlag((prev) => !prev);
+    if (fieldState["showCkPwFlag"]) {
+      pushFieldData("showCkPwFlag", !fieldState["showCkPwFlag"]);
+    }
   };
 
   const handleCheckboxChange = () => {
-    setIsChecked((prev) => !prev);
+    if (fieldState["isChecked"]) {
+      pushFieldData("isChecked", !fieldState["isChecked"]);
+    }
   };
 
   const handleLoginClick = () => {
@@ -138,54 +146,67 @@ export default function Signup() {
   };
 
   const handleOpenModal = () => {
-    setOpenModal(true);
+    pushFieldData("openModal", true);
   };
 
   const handleCloseModal = () => {
-    setOpenModal(false);
+    pushFieldData("openModal", false);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validateType(name, "name")) {
-      setNameErrFlag(true);
+    if (!validateType(fieldState["name"], "name")) {
+      pushFieldData("nameErrFlag", true);
+
+      return;
     } else {
-      setNameErrFlag(false);
+      pushFieldData("nameErrFlag", false);
     }
 
-    if (!validateType(email, "email")) {
-      setEmailErrFlag(true);
+    if (!validateType(fieldState["email"], "email")) {
+      pushFieldData("emailErrFlag", true);
+
+      return;
     } else {
-      setEmailErrFlag(false);
+      pushFieldData("emailErrFlag", false);
     }
 
-    if (!validateType(password, "password")) {
-      setPwErrFlag(true);
+    if (!validateType(fieldState["password"], "password")) {
+      pushFieldData("pwErrFlag", true);
+
+      return;
     } else {
-      setPwErrFlag(false);
+      pushFieldData("pwErrFlag", false);
     }
 
-    if (!validateType(chkPassword, "password")) {
-      setChkPwErrFlag(true);
+    if (!validateType(fieldState["chkPassword"], "password")) {
+      pushFieldData("chkPwErrFlag", true);
+      return;
     } else {
-      setChkPwErrFlag(false);
+      pushFieldData("chkPwErrFlag", false);
     }
 
-    if (!year) {
-      setYearErrFlag(true);
+    if (!fieldState["year"]) {
+      pushFieldData("yearErrFlag", true);
+      return;
     }
-    if (!month) {
-      setMonthErrFlag(true);
+    if (!fieldState["month"]) {
+      pushFieldData("monthErrFlag", true);
+      return;
     }
-    if (!date) {
-      setDateErrFlag(true);
+    if (!fieldState["date"]) {
+      pushFieldData("dateErrFlag", true);
+      return;
     }
 
-    if (!pwErrFlag) {
-      // 로그인
-    } else {
-      // 에러
-    }
+    const formData = {
+      name: fieldState["name"],
+      email: fieldState["email"],
+      password: fieldState["password"],
+      birthDate: fieldState["year"] + fieldState["month"] + fieldState["date"],
+    };
+
+    dispatch(asign(formData));
   };
 
   const validateType = (value, type) => {
@@ -202,7 +223,7 @@ export default function Signup() {
   };
 
   const emailCodeTxt = (value) => {
-    setCode(String(value));
+    pushFieldData("code", value);
   };
 
   return (
@@ -224,19 +245,21 @@ export default function Signup() {
           <LoginInput
             id="name"
             placeholder="Name"
+            value={fieldState["name"]}
             handleInputChange={handleNameChange}
             startIcon={FiUser}
-            errFlag={nameErrFlag}
+            errFlag={fieldState["nameErrFlag"]}
           />
           <LoginVerInput
             id="email"
             placeholder="Email"
+            value={fieldState["email"]}
             handleInputChange={handleEmailChange}
             startIcon={FiMail}
             clickVerify={handleSendMail}
-            errFlag={emailErrFlag}
+            errFlag={fieldState["emailErrFlag"]}
           />
-          {isVerified ? (
+          {fieldState["isVerified"] ? (
             <div className="flex items-center font-nanum text-sm text-green-600 space-x-2">
               <FaCheck />
               <p>인증이 완료되었습니다.</p>
@@ -247,7 +270,7 @@ export default function Signup() {
               <p>이메일 인증을 진행해주세요.</p>
             </div>
           )}
-          {verCnt > 0 && !isVerified && (
+          {verCnt > 0 && !fieldState["isVerified"] && (
             <div className="my-5">
               <VerCodeInput text={emailCodeTxt} />
               <VerifyTimer />
@@ -260,12 +283,13 @@ export default function Signup() {
           <LoginInput
             id="password"
             placeholder="Password"
-            type={showPwFlag ? "text" : "password"}
+            value={fieldState["password"]}
+            type={fieldState["showPwFlag"] ? "text" : "password"}
             handleInputChange={handlePasswordChange}
             startIcon={FiLock}
-            endIcon={showPwFlag ? FiEyeOff : FiEye}
+            endIcon={fieldState["showPwFlag"] ? FiEyeOff : FiEye}
             clickEndIcon={handlePwShowClick}
-            errFlag={pwErrFlag}
+            errFlag={fieldState["pwErrFlag"]}
           />
           <p className="font-nanum text-sm text-gray-700">
             * 영문, 숫자, 특수 기호를 포함하여 8글자 이상
@@ -273,14 +297,15 @@ export default function Signup() {
           <LoginInput
             id="chechkPassword"
             placeholder="Check Password"
-            type={showCkPwFlag ? "text" : "password"}
+            value={fieldState["chkPassword"]}
+            type={fieldState["showCkPwFlag"] ? "text" : "password"}
             handleInputChange={handleChkPasswordChange}
             startIcon={FiCheck}
-            endIcon={showCkPwFlag ? FiEyeOff : FiEye}
+            endIcon={fieldState["showCkPwFlag"] ? FiEyeOff : FiEye}
             clickEndIcon={handleCkPwShowClick}
-            errFlag={chkPwErrFlag}
+            errFlag={fieldState["chkPwErrFlag"]}
           />
-          {pwMissMatch && (
+          {fieldState["pwMissMatch"] && (
             <p className="font-nanum text-sm text-red-600">
               비밀번호가 일치하지 않습니다.
             </p>
@@ -289,32 +314,35 @@ export default function Signup() {
             <LoginDropDown
               id="year"
               type="year"
-              value={year && year}
-              setData={setYear}
+              value={fieldState["year"]}
+              setData={(value) => pushFieldData("year", value)}
               startIcon={FiCalendar}
               placeholder="Year"
-              errFlag={yearErrFlag}
+              errFlag={fieldState["yearErrFlag"]}
             />
             <LoginDropDown
               id="month"
               type="month"
-              value={month && month}
-              setData={setMonth}
+              value={fieldState["month"]}
+              setData={(value) => pushFieldData("month", value)}
               placeholder="Month"
-              errFlag={monthErrFlag}
+              errFlag={fieldState["monthErrFlag"]}
             />
             <LoginDropDown
               id="date"
               type="date"
-              value={date && date}
-              setData={setDate}
+              value={fieldState["date"]}
+              setData={(value) => pushFieldData("date", value)}
               placeholder="Date"
-              errFlag={dateErrFlag}
+              errFlag={fieldState["dateErrFlag"]}
             />
           </div>
           <div className="w-full mt-3">
             <div onClick={() => handleOpenModal()}>
-              <CheckboxS text="개인 정보 수집 동의" checked={isChecked} />
+              <CheckboxS
+                text="개인 정보 수집 동의"
+                checked={fieldState["isChecked"]}
+              />
             </div>
           </div>
           <AccountButton text="회원가입" />
@@ -324,9 +352,9 @@ export default function Signup() {
         </div>
       </div>
 
-      <Modal isOpen={openModal} onClose={handleCloseModal}>
+      <Modal isOpen={fieldState["openModal"]} onClose={handleCloseModal}>
         <PrivacyPolicy
-          isChecked={isChecked}
+          isChecked={fieldState["isChecked"]}
           handleCheckboxChange={handleCheckboxChange}
         />
       </Modal>
