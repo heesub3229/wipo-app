@@ -19,3 +19,11 @@ export const emailValid = createAsyncThunk(
     return data;
   }
 );
+export const asign = createAsyncThunk("user/asign", async ({ formData }) => {
+  const { data } = await axios.post(`${serverUrl}/user/asign`, formData, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return data;
+});
