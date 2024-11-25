@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect } from "react";
-import { Lodaing } from "./Common";
+import { LoginLoading } from "./Common";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setToken } from "../slices/auth";
@@ -37,7 +37,7 @@ export const KakaoLogin = () => {
 
   return (
     <>
-      <Lodaing />
+      <LoginLoading />
     </>
   );
 };
@@ -74,7 +74,7 @@ export const NaverLogin = () => {
 
   return (
     <>
-      <Lodaing />
+      <LoginLoading />
     </>
   );
 };
@@ -111,7 +111,7 @@ export const GoogleLogin = () => {
 
   return (
     <>
-      <Lodaing />
+      <LoginLoading />
     </>
   );
 };
