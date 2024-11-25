@@ -89,8 +89,19 @@ export const VerCodeInput = ({ text }) => {
       if (index < inputRefs.current.length - 1) {
         inputRefs.current[index + 1].focus();
       }
-    } else {
-      e.target.value = ""; // 잘못된 입력 제거
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace") {
+      const newInputs = [...inputs];
+      newInputs[index] = ""; // 현재 입력값 지우기
+      setInputs(newInputs);
+
+      // 이전 입력 필드로 포커스 이동
+      if (index > 0) {
+        inputRefs.current[index - 1].focus();
+      }
     }
   };
 
@@ -110,11 +121,7 @@ export const VerCodeInput = ({ text }) => {
           maxLength="1"
           value={inputs[index]} // 상태로 입력값 관리
           onChange={(e) => handleChange(e, index)}
-          onKeyDown={(e) => {
-            if (e.key === "Backspace" && index > 0 && !e.target.value) {
-              inputRefs.current[index - 1].focus();
-            }
-          }}
+          onKeyDown={(e) => handleKeyDown(e, index)}
         />
       ))}
     </div>

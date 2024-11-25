@@ -5,6 +5,11 @@
 /* 스크롤바 넓이 지정 */
 ::-webkit-scrollbar {
   width: 5px;
+  height: 5px;
+}
+
+html, body {
+  overflow-x: hidden; /* 가로 스크롤 완전히 숨기기 */
 }
 
 /* 스크롤바 트랙 꾸미기 */
