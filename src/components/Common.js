@@ -31,30 +31,65 @@ export const Loading = ({ isLoading }) => {
   );
 };
 
-export const Error = ({ errFlag }) => {
-  const [visible, setVisible] = useState(true);
+export const Error = ({ errorMessages, status }) => {
+  const [errors, setErrors] = useState([]);
+
+  const addError = (message) => {
+    const id = Date.now();
+    const timeoutId = setTimeout(() => removeError(id), 5000);
+
+    setErrors((prevErrors) => [
+      ...prevErrors,
+      { id, message, timeoutId, visible: false },
+    ]);
+
+    setTimeout(() => {
+      setErrors((prevErrors) =>
+        prevErrors.map((err) =>
+          err.id === id ? { ...err, visible: true } : err
+        )
+      );
+    }, 100);
+  };
+
+  const removeError = (id) => {
+    setErrors((prevErrors) => prevErrors.filter((err) => err.id !== id));
+  };
 
   useEffect(() => {
-    if (errFlag) {
-      setVisible(true);
-      const timer = setTimeout(() => {
-        setVisible(false);
-      }, 5000);
-
-      return () => clearTimeout(timer);
+    if (errorMessages) {
+      addError(errorMessages);
     }
-  }, [errFlag]);
+  }, [errorMessages]);
 
-  if (!visible) return null;
+  if (errors.length === 0) return null;
   return (
-    <div className="fixed bottom-2 right-2 bg-gray-600 min-w-1/6 max-w-1/4 min-h-1/15 rounded-md flex flex-col p-2">
-      <p className="font-nanum text-white text-sm ml-2">{/* 에러 타이틀 */}</p>
-      <div className="flex justify-center items-center space-x-3 p-1">
-        <p className="text-red-400 text-xl">
-          <FaCircleExclamation />
-        </p>
-        <p className="text-white font-nanum">{/* 에러 처리 */}</p>
-      </div>
+    <div
+      className={`fixed bottom-2 right-2 flex flex-col space-y-2 min-w-1/8 max-w-1/4 min-h-1/15 max-h-60vh overflow-y-auto ${
+        errors.length > 5 ? "overflow-y-auto" : "overflow-y-hidden"
+      }`}
+    >
+      {errors.map((err) => (
+        <div
+          key={err.id}
+          className={`bg-gray-600 p-2 rounded-md cursor-pointer transition-all duration-300 ${
+            err.visible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-10"
+          }`}
+          onClick={() =>
+            setErrors((prevErrors) => prevErrors.filter((e) => e.id !== err.id))
+          }
+        >
+          <p className="font-nanum text-white text-sm ml-2">{status} Error</p>
+          <div className="flex items-center space-x-3 p-1">
+            <p className="text-red-400 text-xl">
+              <FaCircleExclamation />
+            </p>
+            <p className="text-white font-nanum">{err.message}</p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
