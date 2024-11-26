@@ -1,40 +1,50 @@
 import React, { useEffect, useRef, useState } from "react";
 
-export const LoginInput = ({
-  id,
-  value,
-  placeholder,
-  type,
-  handleInputChange,
-  startIcon: StartIcon,
-  endIcon: EndIcon,
-  clickEndIcon,
-  errFlag,
-}) => {
-  return (
-    <div
-      className={`flex items-center mt-3 bg-white w-full p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none ${
-        errFlag ? "border-red-600" : "border-gray-300"
-      }`}
-    >
-      {StartIcon && <StartIcon className="text-gray-400 mr-2" />}
-      <input
-        className="w-full focus:outline-none font-nanum text-sm"
-        type={type ? type : "text"}
-        id={id}
-        value={value}
-        onChange={(e) => handleInputChange(e.target.value)}
-        placeholder={placeholder}
-      />
-      {EndIcon && (
-        <EndIcon
-          className="text-gray-400 mr-2 cursor-pointer"
-          onClick={() => clickEndIcon()}
+export const LoginInput = React.memo(
+  function LoginInput({
+    id,
+    value,
+    placeholder,
+    type,
+    handleInputChange,
+    startIcon: StartIcon,
+    endIcon: EndIcon,
+    clickEndIcon,
+    errFlag,
+  }) {
+    return (
+      <div
+        className={`flex items-center mt-3 bg-white w-full p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none ${
+          errFlag ? "border-red-600" : "border-gray-300"
+        }`}
+      >
+        {StartIcon && <StartIcon className="text-gray-400 mr-2" />}
+        <input
+          className="w-full focus:outline-none font-nanum text-sm"
+          type={type ? type : "text"}
+          id={id}
+          value={value}
+          onChange={(e) => handleInputChange(e.target.value)}
+          placeholder={placeholder}
         />
-      )}
-    </div>
-  );
-};
+        {EndIcon && (
+          <EndIcon
+            className="text-gray-400 mr-2 cursor-pointer"
+            onClick={() => clickEndIcon()}
+          />
+        )}
+      </div>
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.value === nextProps.value &&
+      prevProps.errFlag === nextProps.errFlag &&
+      prevProps.type === nextProps.type &&
+      prevProps.EndIcon === nextProps.EndIcon
+    );
+  }
+);
 
 export const LoginVerInput = ({
   id,
