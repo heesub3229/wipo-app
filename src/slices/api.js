@@ -1,4 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
+import moment from "moment-timezone";
+import { nowDate } from "../components/Util";
 
 const initialState = {};
 
@@ -21,45 +23,41 @@ const apiSlice = createSlice({
         (action) => action.type.endsWith("/pending"),
         (state, action) => {
           const apiName = action.type.split("/")[1];
-          state[apiName] = { loading: true, error: null, data: null };
+          state[apiName] = {
+            loading: true,
+            error: null,
+            data: null,
+            status: null,
+            time: nowDate(),
+          };
         }
       )
       .addMatcher(
         (action) => action.type.endsWith("/fulfilled"), // 모든 fulfilled 액션
         (state, action) => {
-          const payload = action.payload;
+          const { status, data } = action.payload;
           const apiName = action.type.split("/")[1];
-          if (payload) {
-            if (payload && payload.errFlag === false) {
-              state[apiName] = {
-                loading: false,
-                error: null,
-                data: action.payload.data ? action.payload.data : false,
-              };
-            } else {
-              state[apiName] = {
-                loading: false,
-                error: action.payload.data,
-                data: null,
-              };
-            }
-          } else {
-            state[apiName] = {
-              loading: false,
-              error: "데이터없음",
-              data: null,
-            };
-          }
+          state[apiName] = {
+            loading: false,
+            error: status !== 200 ? data?.data : null,
+            data: status === 200 ? data?.data : null,
+            status: status,
+            time:
+              moment(data?.resDate).format("YYYY-MM-DD HH:mm:ss") || nowDate(),
+          };
         }
       )
       .addMatcher(
         (action) => action.type.endsWith("/rejected"),
         (state, action) => {
+          const { status, message } = action.payload || {};
           const apiName = action.type.split("/")[1];
           state[apiName] = {
             loading: false,
-            error: action.error.message,
+            error: message,
             data: null,
+            status: status,
+            time: nowDate(),
           };
         }
       );

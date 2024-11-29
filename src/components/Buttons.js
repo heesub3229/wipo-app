@@ -1,11 +1,8 @@
-export const AccountButton = ({ text, handleClick }) => {
+export const AccountButton = ({ text }) => {
   return (
     <button
       type="submit"
       className="font-nanum font-semibold w-full p-3 mt-4 rounded-md bg-indigo-200 hover:bg-indigo-300"
-      onClick={() => {
-        handleClick();
-      }}
     >
       {text}
     </button>

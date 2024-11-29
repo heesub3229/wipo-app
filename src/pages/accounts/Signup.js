@@ -71,6 +71,7 @@ export default function Signup() {
   useEffect(() => {
     if (asignState?.data !== null) {
       if (asignState?.data === false) {
+        dispatch(clearState());
         navigate("/");
       }
     }
@@ -203,7 +204,10 @@ export default function Signup() {
       name: name,
       email: email,
       password: password,
-      birthDate: year + month + date,
+      birthDate:
+        String(year) +
+        String(month).padStart(2, "0") +
+        String(date).padStart(2, "0"),
     };
 
     dispatch(asign(formData));

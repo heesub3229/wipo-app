@@ -12,10 +12,14 @@ import Logo from "../../images/accounts/Logo.png";
 import Kakao from "../../images/accounts/Kakao.png";
 import Naver from "../../images/accounts/Naver.png";
 import Google from "../../images/accounts/Google.png";
-import { generateState } from "../../components/Util";
-import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
+import { generateState, nowDate } from "../../components/Util";
 import { useDispatch, useSelector } from "react-redux";
 import { cookieSave, removeCookie } from "../../slices/cookie";
+import { login } from "../../api/UserApi";
+import { clearAuth, setToken } from "../../slices/auth";
+import moment from "moment-timezone";
+import { saveUser } from "../../components/LoginIng";
+import { pushError } from "../../slices/error";
 
 export default function Login() {
   const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -92,36 +96,72 @@ export default function Login() {
   };
 
   const handleKakaoLogin = () => {
+    clearAuth();
     const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${KakaoApiKey}&redirect_uri=${kakaoRectUrl}&response_type=code`;
 
     window.location.href = kakaoURL;
   };
-
-  const handleNaverLogin = () => {
-    const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naverClientId}&redirect_uri=${naverRedirectUri}&state=${generateState()}`;
-    window.location.href = naverAuthUrl;
-  };
+  const handleNaverLogin = () => {};
 
   const handleGoogleLogin = () => {
+    clearAuth();
     const googleUri = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&prompt=consent&client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&scope=https://www.googleapis.com/auth/userinfo.email%20https://www.googleapis.com/auth/userinfo.profile%20openid&access_type=offline&state=${generateState()}`;
     window.location.href = googleUri;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    clearAuth();
     const isValidEmail = validateEmail(email);
     setEmailErrFlag(!isValidEmail);
 
     if (!password) {
       setPwErrFlag(true);
     }
+    try {
+      if (isValidEmail && !pwErrFlag) {
+        const formData = { email: email, password: password };
+        const loginAction = await dispatch(login(formData)).unwrap();
+        if (loginAction?.status === 200) {
+          const tokenPayload = await tokenSave(loginAction?.data?.data);
+          if (tokenPayload) {
+            const ret = await dispatch(saveUser()).unwrap();
+            const { status, data } = ret;
+            if (status === 200) {
+              navigate(data);
+            }
+          } else {
+            pushError({
+              type: "login",
+              error: "토큰없음",
+              status: 400,
+              time: nowDate(),
+            });
+          }
+        } else {
+          return;
+        }
+      }
+    } catch (error) {
+      pushError({
+        type: "login",
+        error: error?.message?.data || "로그인에러",
+        status: error?.status || 400,
+        time:
+          moment(error?.message?.resDate).format("YYYY-MM-DD HH:mm:ss") ||
+          nowDate(),
+      });
+    }
+  };
 
-    if (isValidEmail && !pwErrFlag) {
-      // 처음 로그인
-      navigate("/FirstLogin");
-      // 로그인
-      // navigate("/Main");
+  const tokenSave = async (token) => {
+    if (token) {
+      const tokenAction = await dispatch(
+        setToken({ jwtToken: token, loginType: "W" })
+      );
+      return tokenAction.payload;
     } else {
-      // 에러
+      return null;
     }
   };
 
@@ -171,7 +211,7 @@ export default function Login() {
               handleCheckboxChange={handleCheckboxChange}
             />
           </div>
-          <AccountButton text="로그인" handleClick={handleSubmit} />
+          <AccountButton text="로그인" />
         </form>
         <div className="w-full flex justify-between mt-3 ">
           <AccountText text="회원가입" handleClick={handleSignupClick} />

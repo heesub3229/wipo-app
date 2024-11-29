@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { FaCircleExclamation } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
+import { clearState } from "../slices/api";
+import { delError } from "../slices/error";
+import moment from "moment-timezone";
 
 export const Divider = ({ text }) => {
   return (
@@ -22,27 +26,42 @@ export const LoginLoading = () => {
   );
 };
 
-export const Loading = ({ isLoading }) => {
-  if (!isLoading) return null;
+export const Loading = () => {
+  const isLoading = useSelector((state) =>
+    Object.values(state.api).some((api) => api?.loading)
+  );
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 pointer-events-auto">
-      <div className="w-12 h-12 border-4 border-t-indigo-500 border-gray-300 rounded-full animate-spin"></div>
-    </div>
+    isLoading && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 pointer-events-auto">
+        <div className="w-12 h-12 border-4 border-t-indigo-500 border-gray-300 rounded-full animate-spin"></div>
+      </div>
+    )
   );
 };
 
-export const Error = ({ errorMessages, status }) => {
+export const Error = () => {
+  const error = useSelector((state) => Object.entries(state.error) || {});
+  const dispatch = useDispatch();
   const [errors, setErrors] = useState([]);
+  useEffect(() => {
+    error.forEach(([key, value]) => {
+      if (key) {
+        addError(key, value);
+      }
+    });
+  }, [error]);
 
-  const addError = (message) => {
-    const id = Date.now();
-    const timeoutId = setTimeout(() => removeError(id), 5000);
-
+  const addError = (id, message) => {
+    // 새로운 에러 추가
     setErrors((prevErrors) => [
       ...prevErrors,
-      { id, message, timeoutId, visible: false },
+      { id, message, timeoutId: null, visible: false },
     ]);
 
+    // 바로 상태 삭제를 디스패치
+    dispatch(delError(id));
+
+    // 0.1초 후 에러 표시
     setTimeout(() => {
       setErrors((prevErrors) =>
         prevErrors.map((err) =>
@@ -50,17 +69,18 @@ export const Error = ({ errorMessages, status }) => {
         )
       );
     }, 100);
-  };
 
+    // 5초 후 에러 제거
+    const timeoutId = setTimeout(() => removeError(id), 5000);
+
+    // 타임아웃 ID 업데이트
+    setErrors((prevErrors) =>
+      prevErrors.map((err) => (err.id === id ? { ...err, timeoutId } : err))
+    );
+  };
   const removeError = (id) => {
     setErrors((prevErrors) => prevErrors.filter((err) => err.id !== id));
   };
-
-  useEffect(() => {
-    if (errorMessages) {
-      addError(errorMessages);
-    }
-  }, [errorMessages]);
 
   if (errors.length === 0) return null;
   return (
@@ -72,22 +92,25 @@ export const Error = ({ errorMessages, status }) => {
       {errors.map((err) => (
         <div
           key={err.id}
-          className={`bg-gray-600 p-2 rounded-md cursor-pointer transition-all duration-300 ${
+          className={`bg-gray-600 px-2 pt-2 pb-1 rounded-md cursor-pointer transition-all duration-300 ${
             err.visible
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-10"
           }`}
-          onClick={() =>
-            setErrors((prevErrors) => prevErrors.filter((e) => e.id !== err.id))
-          }
+          onClick={() => dispatch(delError(err.id))}
         >
-          <p className="font-nanum text-white text-sm ml-2">{status} Error</p>
+          <p className="font-nanum text-white text-sm ml-2">
+            {err.message.status} Error
+          </p>
           <div className="flex items-center space-x-3 p-1">
             <p className="text-red-400 text-xl">
               <FaCircleExclamation />
             </p>
-            <p className="text-white font-nanum">{err.message}</p>
+            <p className="text-white font-nanum">{err.message.error}</p>
           </div>
+          <p className="font-nanum text-[10px] text-white text-right">
+            {err.message.time}
+          </p>
         </div>
       ))}
     </div>

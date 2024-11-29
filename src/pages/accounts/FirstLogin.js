@@ -6,9 +6,15 @@ import { AccountTitle } from "../../components/Typography";
 import { FiUser, FiCalendar, FiArrowRight } from "react-icons/fi";
 import { LoginDropDown } from "../../components/DropDown";
 import { TextButton } from "../../components/Buttons";
+import { useDispatch, useSelector } from "react-redux";
+import { saveNameBirth } from "../../api/UserApi";
+import { saveUserInfo } from "../../slices/auth";
+import { pushError } from "../../slices/error";
+import { nowDate } from "../../components/Util";
 
 export default function FirstLogin() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [year, setYear] = useState("");
@@ -18,6 +24,17 @@ export default function FirstLogin() {
   const [yearErrFlag, setYearErrFlag] = useState(false);
   const [monthErrFlag, setMonthErrFlag] = useState(false);
   const [dateErrFlag, setDateErrFlag] = useState(false);
+
+  const authState = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (authState?.name) {
+      setName(authState?.name);
+    }
+    if (authState?.name && authState?.dateBirth && step === 1) {
+      navigate("/Main");
+    }
+  }, [authState, step]);
 
   useEffect(() => {
     if (year) {
@@ -38,14 +55,52 @@ export default function FirstLogin() {
     setNameErrFlag(false);
   };
 
-  const handleNextClick = () => {
-    if (step === 1) {
-      if (!name) {
-        setNameErrFlag(true);
-        return;
-      }
+  const handleNextNameClick = async () => {
+    const nameAction = await dispatch(
+      saveNameBirth({ jwt: authState.jwtToken, name: name, dateBirth: null })
+    );
+    const retInfo = nameAction.payload?.data?.data;
+
+    if (!retInfo) {
+      pushError({
+        type: "saveNameBirth",
+        error: "정보저장에러",
+        status: 400,
+        time: nowDate(),
+      });
     }
-    setStep((prevStep) => prevStep + 1); // 다음 단계로 이동
+
+    const retUser = dispatch(saveUserInfo(retInfo));
+    if (retUser.payload?.name) {
+      setStep(2);
+    }
+  };
+
+  const handleNextBirthClick = async () => {
+    const dateBirth =
+      String(year) +
+      String(month).padStart(2, "0") +
+      String(date).padStart(2, "0");
+    const dateBirthAction = await dispatch(
+      saveNameBirth({
+        jwt: authState.jwtToken,
+        name: null,
+        dateBirth: dateBirth,
+      })
+    );
+    const retInfo = dateBirthAction.payload?.data?.data;
+    if (!retInfo) {
+      pushError({
+        type: "saveNameBirth",
+        error: "정보저장에러",
+        status: 400,
+        time: nowDate(),
+      });
+    }
+    const retUser = dispatch(saveUserInfo(retInfo));
+    if (retUser.payload?.dateBirth) {
+      setStep(3);
+    }
   };
 
   const handleStartClick = () => {
@@ -59,7 +114,6 @@ export default function FirstLogin() {
       return pattern.test(value);
     }
   };
-
   return (
     <div className="min-h-screen w-screen bg-back flex justify-center items-center">
       <div className="w-1/3 min-h-2/4 border border-gray-100 border-solid rounded-2xl bg-white flex flex-col justify-center items-center p-8 shadow-md">
@@ -67,11 +121,12 @@ export default function FirstLogin() {
         {step === 1 && (
           <>
             <p className="mt-8 font-nanum text-gray-900 font-semibold text-left">
-              1. 이름을 입력해주세요.
+              이름을 입력해주세요.
             </p>
             <UnderLineInput
               id="name"
               placeholder="Name"
+              value={name}
               handleInputChange={handleNameChange}
               startIcon={FiUser}
               errFlag={nameErrFlag}
@@ -79,14 +134,14 @@ export default function FirstLogin() {
             <TextButton
               text="다음"
               endIcon={FiArrowRight}
-              handleClick={handleNextClick}
+              handleClick={handleNextNameClick}
             />
           </>
         )}
         {step === 2 && (
           <>
             <p className="mt-8 font-nanum text-gray-900 font-semibold text-left">
-              2. 생년월일을 입력해주세요.
+              생년월일을 입력해주세요.
             </p>
             <div className="flex space-x-2">
               <LoginDropDown
@@ -118,7 +173,7 @@ export default function FirstLogin() {
             <TextButton
               text="다음"
               endIcon={FiArrowRight}
-              handleClick={handleNextClick}
+              handleClick={handleNextBirthClick}
             />
           </>
         )}
