@@ -28,6 +28,7 @@ export default function FirstLogin() {
   const authState = useSelector((state) => state.auth);
 
   useEffect(() => {
+    console.log("auth", authState);
     if (authState?.name) {
       setName(authState?.name);
     }

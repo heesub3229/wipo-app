@@ -143,7 +143,7 @@ export const saveUser = createAsyncThunk(
 
     try {
       const result = await dispatch(userInfo(authState.jwtToken)).unwrap();
-
+      console.log("토큰API", result);
       const { status, data } = result;
       if (status === 200 && data?.data) {
         dispatch(
