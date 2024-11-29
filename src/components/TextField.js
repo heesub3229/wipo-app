@@ -209,7 +209,7 @@ export const TitleInput = ({
   );
 };
 
-export const ContentInput = ({ placeholder, handleInputChange }) => {
+export const ContentInput = ({ value, placeholder, handleInputChange }) => {
   const textareaRef = useRef(null);
 
   const handleDivClick = () => {
@@ -225,6 +225,7 @@ export const ContentInput = ({ placeholder, handleInputChange }) => {
       <textarea
         ref={textareaRef}
         className="resize-none w-full h-full focus:outline-none focus:border-none"
+        value={value}
         placeholder={placeholder}
         onChange={(e) => handleInputChange(e.target.value)}
       />
