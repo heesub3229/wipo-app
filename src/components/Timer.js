@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-export const VerifyTimer = () => {
-  const emailAuthState = useSelector((state) => state.api.emailAuth);
+export const VerifyTimer = ({ time }) => {
   const calculateTimeLeft = () => {
-    const remainingTime = Math.floor(
-      (new Date(emailAuthState?.data) - new Date()) / 1000
-    );
-    return remainingTime > 0 ? remainingTime : 0;
+    if (time) {
+      const remainingTime = Math.floor(
+        (new Date(time?.data) - new Date()) / 1000
+      );
+      return remainingTime > 0 ? remainingTime : 0;
+    }
   };
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
 
   useEffect(() => {
     // expTime 변경 시 타이머 초기화
     setTimeLeft(calculateTimeLeft());
-  }, [emailAuthState?.data]);
+  }, [time?.data]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -28,7 +29,7 @@ export const VerifyTimer = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [emailAuthState?.data]);
+  }, [time?.data]);
 
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);

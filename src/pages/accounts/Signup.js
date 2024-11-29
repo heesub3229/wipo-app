@@ -60,7 +60,7 @@ export default function Signup() {
   const dispatch = useDispatch();
   const emailValidState = useSelector((state) => state.api.emailValid);
   const asignState = useSelector((state) => state.api.asign);
-
+  const emailAuthState = useSelector((state) => state.api.emailAuth);
   useEffect(() => {
     if (emailValidState?.data === false) {
       setIsVerified(true);
@@ -277,7 +277,7 @@ export default function Signup() {
           {verCnt > 0 && !isVerified && (
             <div className="my-5">
               <VerCodeInput text={emailCodeTxt} />
-              <VerifyTimer />
+              <VerifyTimer time={emailAuthState} />
               <div className="w-full flex space-x-4 mt-4">
                 <OutlinedButton text="재전송" handleClick={handleSendMail} />
                 <FilledButton text="인증하기" handleClick={handleClickVerify} />

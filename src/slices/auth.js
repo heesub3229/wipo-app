@@ -18,7 +18,7 @@ const authSlice = createSlice({
       state.loginType = loginType;
     },
     clearAuth: (state) => {
-      state.token = null; // 토큰 초기화
+      state.jwtToken = null; // 토큰 초기화
       state.email = null;
       state.dateBirth = null;
       state.name = null;

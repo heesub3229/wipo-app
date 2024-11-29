@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { saveNameBirth } from "../../api/UserApi";
 import { saveUserInfo } from "../../slices/auth";
 import { pushError } from "../../slices/error";
-import { nowDate } from "../../components/Util";
+import { changeDateStr, nowDate } from "../../components/Util";
 
 export default function FirstLogin() {
   const navigate = useNavigate();
@@ -77,10 +77,7 @@ export default function FirstLogin() {
   };
 
   const handleNextBirthClick = async () => {
-    const dateBirth =
-      String(year) +
-      String(month).padStart(2, "0") +
-      String(date).padStart(2, "0");
+    const dateBirth = changeDateStr(year, month, date);
     const dateBirthAction = await dispatch(
       saveNameBirth({
         jwt: authState.jwtToken,

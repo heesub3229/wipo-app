@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AccountTitle, AccountText } from "../../components/Typography";
@@ -8,11 +8,15 @@ import { AccountButton } from "../../components/Buttons";
 import { FiUser, FiCalendar } from "react-icons/fi";
 import LoginBack from "../../images/accounts/LoginBack.png";
 import Logo from "../../images/accounts/Logo.png";
+import { useDispatch } from "react-redux";
+import { findEmail } from "../../api/UserApi";
+import { changeDateStr } from "../../components/Util";
 
 export default function FindId() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [findFlag, setFindFlag] = useState(false);
-  const [account, setAccount] = useState("juyoung05@hanmail.net");
+  const [account, setAccount] = useState("");
   const [name, setName] = useState("");
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
@@ -26,15 +30,6 @@ export default function FindId() {
     setNameErrFlag(false);
   };
 
-  useEffect(() => {
-    if (account) {
-      const [id, domain] = account.split("@");
-      const visibleId = id.slice(0, -3);
-      const maskedId = "***";
-      setAccount(`${visibleId}${maskedId}@${domain}`);
-    }
-  }, [account]);
-
   const handleLoginClick = () => {
     navigate("/");
   };
@@ -47,7 +42,25 @@ export default function FindId() {
     navigate("/FindPw");
   };
 
-  const handleFindIdClick = () => {};
+  const handleFindIdClick = async (event) => {
+    event.preventDefault();
+
+    const dateBirth = changeDateStr(year, month, date);
+
+    const findAction = await dispatch(
+      findEmail({ name: name, dateBirth: dateBirth })
+    );
+    const retdata = findAction.payload;
+
+    if (retdata?.status === 200) {
+      const retEmail = retdata.data?.data;
+      const [id, domain] = retEmail.split("@");
+      const visibleId = id.slice(0, -3);
+      const maskedId = "***";
+      setAccount(`${visibleId}${maskedId}@${domain}`);
+      setFindFlag(true);
+    }
+  };
 
   return (
     <div
@@ -65,43 +78,46 @@ export default function FindId() {
       <div className="w-1/4 min-h-2/4 border border-gray-100 border-solid rounded-2xl backdrop-blur-md flex flex-col justify-center items-center p-8">
         <AccountTitle text="FIND ACCOUNT" />
         {!findFlag ? (
-          <div className="mt-8 w-full">
-            <LoginInput
-              id="name"
-              placeholder="Name"
-              handleInputChange={handleNameChange}
-              startIcon={FiUser}
-              errFlag={nameErrFlag}
-            />
-            <div className="flex space-x-2">
-              <LoginDropDown
-                id="year"
-                type="year"
-                value={year && year}
-                setData={setYear}
-                startIcon={FiCalendar}
-                placeholder="Year"
-                errFlag={yearErrFlag}
+          <form onSubmit={handleFindIdClick}>
+            <div className="mt-8 w-full">
+              <LoginInput
+                id="name"
+                placeholder="Name"
+                value={name}
+                handleInputChange={handleNameChange}
+                startIcon={FiUser}
+                errFlag={nameErrFlag}
               />
-              <LoginDropDown
-                id="month"
-                type="month"
-                value={month && month}
-                setData={setMonth}
-                placeholder="Month"
-                errFlag={monthErrFlag}
-              />
-              <LoginDropDown
-                id="date"
-                type="date"
-                value={date && date}
-                setData={setDate}
-                placeholder="Date"
-                errFlag={dateErrFlag}
-              />
+              <div className="flex space-x-2">
+                <LoginDropDown
+                  id="year"
+                  type="year"
+                  value={year && year}
+                  setData={setYear}
+                  startIcon={FiCalendar}
+                  placeholder="Year"
+                  errFlag={yearErrFlag}
+                />
+                <LoginDropDown
+                  id="month"
+                  type="month"
+                  value={month && month}
+                  setData={setMonth}
+                  placeholder="Month"
+                  errFlag={monthErrFlag}
+                />
+                <LoginDropDown
+                  id="date"
+                  type="date"
+                  value={date && date}
+                  setData={setDate}
+                  placeholder="Date"
+                  errFlag={dateErrFlag}
+                />
+              </div>
+              <AccountButton text="계정 찾기" />
             </div>
-            <AccountButton text="계정 찾기" handleClick={handleFindIdClick} />
-          </div>
+          </form>
         ) : (
           <div className="mt-8 w-full bg-gray-50 p-3 rounded-md mb-2">
             <p className="font-nanum text-base text-center mb-2">등록된 계정</p>

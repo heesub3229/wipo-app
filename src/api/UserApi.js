@@ -172,3 +172,90 @@ export const saveNameBirth = createAsyncThunk(
     }
   }
 );
+
+export const findEmail = createAsyncThunk(
+  "user/findEmail",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${serverUrl}/user/findEmail`, {
+        params: {
+          name: formData.name,
+          dateBirth: formData.dateBirth, // null로 변환
+        },
+      });
+      return { status: response.status, data: response.data };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data || { data: "서버에러" };
+        const status = error.response?.status || 500; // 상태 코드 추출
+
+        // `rejectWithValue`로 에러 정보 반환
+        return rejectWithValue({
+          status,
+          message,
+        });
+      }
+
+      // AxiosError가 아닌 경우 기본 에러 반환
+      return rejectWithValue({ status: 500, message: { data: "서버에러" } });
+    }
+  }
+);
+
+export const findPass = createAsyncThunk(
+  "user/findPass",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${serverUrl}/user/findPass`, {
+        params: {
+          email: formData.email,
+          name: formData.name,
+        },
+      });
+      return { status: response.status, data: response.data };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data || { data: "서버에러" };
+        const status = error.response?.status || 500; // 상태 코드 추출
+
+        // `rejectWithValue`로 에러 정보 반환
+        return rejectWithValue({
+          status,
+          message,
+        });
+      }
+
+      // AxiosError가 아닌 경우 기본 에러 반환
+      return rejectWithValue({ status: 500, message: { data: "서버에러" } });
+    }
+  }
+);
+
+export const changePass = createAsyncThunk(
+  "user/changePass",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${serverUrl}/user/changePass`, {
+        params: {
+          email: formData.email,
+          password: formData.password,
+        },
+      });
+      return { status: response.status, data: response.data };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data || { data: "서버에러" };
+        const status = error.response?.status || 500; // 상태 코드 추출
+
+        // `rejectWithValue`로 에러 정보 반환
+        return rejectWithValue({
+          status,
+          message,
+        });
+      }
+
+      // AxiosError가 아닌 경우 기본 에러 반환
+      return rejectWithValue({ status: 500, message: { data: "서버에러" } });
+    }
+  }
+);

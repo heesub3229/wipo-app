@@ -64,7 +64,7 @@ export const LoginDropDown = React.memo(
           {StartIcon && <StartIcon className="text-gray-400 mr-2" />}
           <input
             className="w-full focus:outline-none font-nanum text-sm"
-            typeArr="text"
+            type="text"
             id={id}
             value={value}
             placeholder={placeholder}

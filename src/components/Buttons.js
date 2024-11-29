@@ -9,6 +9,19 @@ export const AccountButton = ({ text }) => {
   );
 };
 
+export const AccountButton2 = ({ text, handleClick }) => {
+  return (
+    <button
+      className="font-nanum font-semibold w-full p-3 mt-4 rounded-md bg-indigo-200 hover:bg-indigo-300"
+      onClick={() => {
+        handleClick();
+      }}
+    >
+      {text}
+    </button>
+  );
+};
+
 export const FilledButton = ({ text, handleClick }) => {
   return (
     <button

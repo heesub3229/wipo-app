@@ -152,6 +152,11 @@ export const saveUser = createAsyncThunk(
             name: data?.data?.name,
           })
         );
+
+        if (data?.data?.name && data?.data?.dateBirth) {
+          return { status: 200, data: "/Main" };
+        }
+
         return { status: 200, data: "/FirstLogin" };
       } else {
         return rejectWithValue({

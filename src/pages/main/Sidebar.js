@@ -16,9 +16,12 @@ import {
   FaLocationArrow,
 } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import { clearAuth } from "../../slices/auth";
+import { useDispatch } from "react-redux";
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const handleAddclick = () => {
     navigate("/WritePost");
   };
@@ -31,6 +34,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const handlePopRest = () => {};
   const handleNavClick = () => {};
   const handleLogoutClick = () => {
+    dispatch(clearAuth());
     navigate("/");
   };
   return (
