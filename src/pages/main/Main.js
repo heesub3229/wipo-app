@@ -8,7 +8,7 @@ export default function Main() {
   return (
     <div className="min-h-screen w-screen bg-back flex justify-center pt-10vh pb-5 overflow-y-hidden">
       <Header />
-      <div className="space-y-5 w-4/5">
+      <div className="space-y-10 w-4/5">
         <Post />
       </div>
     </div>

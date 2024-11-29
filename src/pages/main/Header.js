@@ -21,7 +21,7 @@ export default function Header() {
     <div className="w-screen h-7vh fixed top-0 pr-8 pl-8 bg-indigo-900 flex justify-between items-center z-50 ">
       <div className="flex items-center">
         <div
-          className="p-2 rounded-full hover:bg-indigo-700 flex justify-center items-center text-xl text-gray-50"
+          className="p-2 rounded-full hover:bg-indigo-700 flex justify-center items-center text-xl text-gray-50 cursor-pointer"
           onClick={() => handleOpenClick()}
         >
           <FaBars />

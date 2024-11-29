@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import ImageSlider from "./ImageSlider";
+import { BiSolidDetail } from "react-icons/bi";
+import { Modal } from "../../components/Modal";
+import Posting from "../posting/Posting";
 
 const data = [
   {
@@ -48,6 +51,23 @@ const fileData = [
 ];
 
 export default function Post() {
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [selectedImages, setSelectedImages] = useState([]);
+
+  const handleOpenModal = (post) => {
+    setSelectedPost(post);
+    const images = fileData
+      .filter((file) => file.id === post.id)
+      .map((file) => file.url);
+    setSelectedImages(images);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedPost(null);
+  };
   return (
     <>
       {data &&
@@ -58,10 +78,18 @@ export default function Post() {
 
           return (
             <div
-              className="bg-white h-80vh w-full rounded-lg p-10 overflow-hidden"
+              className="relative bg-white h-80vh w-full rounded-lg p-10 overflow-hidden"
               key={item.id}
             >
-              <p className="font-nanum text-2xl font-bold">
+              <div className="absolute inset-0 w-full h-[4vh] bg-indigo-100 flex items-center justify-end px-5">
+                <div
+                  className="text-indigo-400 text-xl hover:bg-indigo-200 rounded-full p-1 cursor-pointer"
+                  onClick={() => handleOpenModal(item)}
+                >
+                  <BiSolidDetail />
+                </div>
+              </div>
+              <p className="font-nanum text-2xl font-bold mt-5">
                 {item.date.replace(/^(\d{4})(\d{2})(\d{2})$/, `$1년 $2월 $3일`)}
               </p>
               <p className="font-nanum text-xl mt-2">{item.location}</p>
@@ -78,6 +106,11 @@ export default function Post() {
             </div>
           );
         })}
+      <Modal isOpen={openModal} onClose={handleCloseModal}>
+        {selectedPost && (
+          <Posting post={selectedPost} images={selectedImages} />
+        )}
+      </Modal>
     </>
   );
 }
