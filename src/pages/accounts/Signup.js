@@ -278,7 +278,7 @@ export default function Signup() {
             <div className="my-5">
               <VerCodeInput text={emailCodeTxt} />
               <VerifyTimer />
-              <div className="w-full flex space-x-4">
+              <div className="w-full flex space-x-4 mt-4">
                 <OutlinedButton text="재전송" handleClick={handleSendMail} />
                 <FilledButton text="인증하기" handleClick={handleClickVerify} />
               </div>

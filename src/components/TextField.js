@@ -173,3 +173,61 @@ export const UnderLineInput = ({
     </div>
   );
 };
+
+export const TitleInput = ({
+  id,
+  value,
+  placeholder,
+  handleClick,
+  startIcon: StartIcon,
+  endIcon: EndIcon,
+  clickEndIcon,
+  errFlag,
+}) => {
+  return (
+    <div
+      className={`flex items-center bg-white w-full p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none ${
+        errFlag ? "border-red-600" : "border-gray-300"
+      }`}
+    >
+      {StartIcon && <StartIcon className="text-gray-600 mr-3" />}
+      <input
+        className="w-full focus:outline-none font-nanum text-lg font-bold"
+        id={id}
+        value={value}
+        placeholder={placeholder}
+        onClick={handleClick}
+        readOnly
+      />
+      {EndIcon && (
+        <EndIcon
+          className="text-gray-400 mr-2 cursor-pointer"
+          onClick={() => clickEndIcon()}
+        />
+      )}
+    </div>
+  );
+};
+
+export const ContentInput = ({ placeholder, handleInputChange }) => {
+  const textareaRef = useRef(null);
+
+  const handleDivClick = () => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
+  return (
+    <div
+      className="h-[59vh] w-full p-4  font-nanum text-lg border border-gray-300 rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none"
+      onClick={handleDivClick}
+    >
+      <textarea
+        ref={textareaRef}
+        className="resize-none w-full h-full focus:outline-none focus:border-none"
+        placeholder={placeholder}
+        onChange={(e) => handleInputChange(e.target.value)}
+      />
+    </div>
+  );
+};

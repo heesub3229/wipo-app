@@ -19,7 +19,9 @@ import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const navigate = useNavigate();
-  const handleAddclick = () => {};
+  const handleAddclick = () => {
+    navigate("/WritePost");
+  };
   const handleCalendarClick = () => {
     navigate("/Calendar");
   };

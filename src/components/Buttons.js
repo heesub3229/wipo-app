@@ -12,7 +12,7 @@ export const AccountButton = ({ text }) => {
 export const FilledButton = ({ text, handleClick }) => {
   return (
     <button
-      className="font-nanum font-semibold w-full p-2 mt-4 rounded-md bg-indigo-400 hover:bg-indigo-500 text-white"
+      className="font-nanum font-semibold w-full p-2 rounded-md bg-indigo-400 hover:bg-indigo-500 text-white"
       onClick={() => {
         handleClick();
       }}
@@ -25,7 +25,7 @@ export const FilledButton = ({ text, handleClick }) => {
 export const OutlinedButton = ({ text, handleClick }) => {
   return (
     <button
-      className="font-nanum font-semibold w-full p-2 mt-4 rounded-md hover:bg-indigo-100 border-2 border-indigo-400 text-indigo-800"
+      className="font-nanum font-semibold w-full p-2 rounded-md hover:bg-indigo-100 border-2 border-indigo-400 text-indigo-400"
       onClick={() => {
         handleClick();
       }}
