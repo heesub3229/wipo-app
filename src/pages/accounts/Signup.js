@@ -61,12 +61,6 @@ export default function Signup() {
   const emailValidState = useSelector((state) => state.api.emailValid);
   const asignState = useSelector((state) => state.api.asign);
   const emailAuthState = useSelector((state) => state.api.emailAuth);
-  useEffect(() => {
-    if (emailValidState?.data === false) {
-      setIsVerified(true);
-      dispatch(clearState());
-    }
-  }, [emailValidState?.data]);
 
   useEffect(() => {
     if (asignState?.data !== null) {
@@ -128,9 +122,17 @@ export default function Signup() {
     setVerCnt((prev) => prev + 1);
   };
 
-  const handleClickVerify = () => {
+  const handleClickVerify = async () => {
     // 인증 되면
-    dispatch(emailValid({ email: email, code: code }));
+    const validAcion = await dispatch(emailValid({ email: email, code: code }));
+
+    if (validAcion) {
+      const validPayload = validAcion?.payload;
+      if (validPayload.status === 200) {
+        setIsVerified(true);
+        dispatch(clearState());
+      }
+    }
   };
 
   const handlePwShowClick = () => {
