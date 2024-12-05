@@ -11,6 +11,7 @@ import { Provider } from "react-redux";
 import store from "./slices/store";
 import Main from "./pages/main/Main";
 import { Error, Loading } from "./components/Common";
+import WritePost from "./pages/post/WritePost";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/FindPW" element={<FindPw />} />
           <Route path="/ResetPW" element={<ResetPw />} />
           <Route path="/FirstLogin" element={<FirstLogin />} />
+          <Route path="/WritePost" element={<WritePost />} />
           <Route path="/Kakao" element={<KakaoLogin />} />
           <Route path="/naver" element={<NaverLogin />} />
           <Route path="/google" element={<GoogleLogin />} />

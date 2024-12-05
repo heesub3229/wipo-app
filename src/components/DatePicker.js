@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
-import { IconButton } from "./Buttons";
+import { CalendarIconButton } from "./Buttons";
 
 const DatePicker = ({ isOpen, setIsOpen, setDate }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -196,14 +196,20 @@ const DatePicker = ({ isOpen, setIsOpen, setDate }) => {
       {calendarMode === "Date" && (
         <>
           <div className="flex justify-between items-center mb-4">
-            <IconButton icon={FaAngleLeft} handleClick={handlePrevMonth} />
+            <CalendarIconButton
+              icon={FaAngleLeft}
+              handleClick={handlePrevMonth}
+            />
             <span
               className="font-bold text-base hover:bg-gray-200 px-3 py-1 rounded-full cursor-pointer"
               onClick={() => handleChangeMode("Date")}
             >
               {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
             </span>
-            <IconButton icon={FaAngleRight} handleClick={handleNextMonth} />
+            <CalendarIconButton
+              icon={FaAngleRight}
+              handleClick={handleNextMonth}
+            />
           </div>
           <div className="grid grid-cols-7 text-center h-4/5">
             {daysOfWeek.map((day) => (
@@ -218,14 +224,20 @@ const DatePicker = ({ isOpen, setIsOpen, setDate }) => {
       {calendarMode === "Month" && (
         <>
           <div className="flex justify-between items-center mb-4">
-            <IconButton icon={FaAngleLeft} handleClick={handlePrevYear} />
+            <CalendarIconButton
+              icon={FaAngleLeft}
+              handleClick={handlePrevYear}
+            />
             <span
               className="font-bold text-base hover:bg-gray-200 px-3 py-1 rounded-full cursor-pointer"
               onClick={() => handleChangeMode("Month")}
             >
               {currentMonth.getFullYear()}년
             </span>
-            <IconButton icon={FaAngleRight} handleClick={handleNextYear} />
+            <CalendarIconButton
+              icon={FaAngleRight}
+              handleClick={handleNextYear}
+            />
           </div>
 
           <div className="grid grid-cols-4 gap-2 h-4/5">
@@ -236,7 +248,10 @@ const DatePicker = ({ isOpen, setIsOpen, setDate }) => {
       {calendarMode === "Year" && (
         <>
           <div className="flex justify-between items-center mb-4">
-            <IconButton icon={FaAngleLeft} handleClick={handlePrevYearBlock} />
+            <CalendarIconButton
+              icon={FaAngleLeft}
+              handleClick={handlePrevYearBlock}
+            />
             <span
               className="font-bold text-base hover:bg-gray-200 px-3 py-1 rounded-full cursor-pointer"
               onClick={() => handleChangeMode("Year")}
@@ -245,7 +260,10 @@ const DatePicker = ({ isOpen, setIsOpen, setDate }) => {
                 currentMonth.getFullYear() + 4
               }년`}
             </span>
-            <IconButton icon={FaAngleRight} handleClick={handleNextYearBlock} />
+            <CalendarIconButton
+              icon={FaAngleRight}
+              handleClick={handleNextYearBlock}
+            />
           </div>
           <div className="grid grid-cols-3 gap-2 h-4/5">
             {renderYearPicker()}

@@ -114,12 +114,15 @@ export const LocationDropDown = ({
   id,
   value,
   placeholder,
+  handleInputChange,
   startIcon: StartIcon,
+  endIcon: EndIcon,
+  clickEndIcon,
   list,
   setData,
   errFlag,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const dropDownRef = useRef();
 
   useEffect(() => {
@@ -136,50 +139,42 @@ export const LocationDropDown = ({
     };
   }, []);
 
-  const handleClick = () => {
-    setIsOpen((prev) => !prev);
-  };
-
   return (
-    <div className="w-full relative" ref={dropDownRef}>
+    <div className="w-full relative z-50" ref={dropDownRef}>
       <div
-        className={`relative flex items-center bg-white p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none ${
+        className={`relative flex items-center bg-white p-3 border-b focus-within:border-b-2 focus-within:border-gray-500 ${
           errFlag ? "border-red-600" : "border-gray-300"
         }`}
       >
         {StartIcon && <StartIcon className="text-gray-600 mr-3" />}
         <input
-          className="w-full focus:outline-none font-nanum text-lg font-bold text-center"
+          className="w-full focus:outline-none font-nanum text font-bold text-center"
           id={id}
           value={value}
           placeholder={placeholder}
-          onClick={() => handleClick()}
-          readOnly
+          onChange={(e) => handleInputChange(e.target.value)}
+          autoFocus
         />
-        {isOpen ? (
-          <FiChevronUp
-            className="text-gray-400 mr-2 cursor-pointer"
-            onClick={() => handleClick()}
-          />
-        ) : (
-          <FiChevronDown
-            className="text-gray-400 mr-2 cursor-pointer"
-            onClick={() => handleClick()}
+        {EndIcon && (
+          <EndIcon
+            className="text-gray-400 mr-2"
+            onClick={() => clickEndIcon()}
           />
         )}
       </div>
-      {isOpen && (
+      {isOpen && Array.isArray(list) && list.length > 0 && (
         <div className="absolute left-0 w-full max-h-60 overflow-y-auto p-2 mt-1 bg-white border rounded shadow-xl font-nanum">
-          {list.map((item) => (
+          {list.map((item, index) => (
             <div
-              key={item}
+              key={`place-${index}`}
               className="p-2 cursor-pointer hover:bg-gray-100"
               onClick={() => {
-                handleClick();
-                setData(item);
+                setIsOpen(false);
+                setData(item.placeName);
               }}
             >
-              {item}
+              <p>{item.placeName}</p>
+              <p className="text-sm">{item.addressName}</p>
             </div>
           ))}
         </div>

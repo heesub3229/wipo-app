@@ -10,7 +10,6 @@ import { FiUser, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import LoginBack from "../../images/accounts/LoginBack.png";
 import Logo from "../../images/accounts/Logo.png";
 import Kakao from "../../images/accounts/Kakao.png";
-import Naver from "../../images/accounts/Naver.png";
 import Google from "../../images/accounts/Google.png";
 import { generateState, nowDate } from "../../components/Util";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,8 +26,6 @@ export default function Login() {
 
   const kakaoRectUrl = process.env.REACT_APP_KAKAO_REDIRECT_URL;
 
-  const naverClientId = process.env.REACT_APP_NAVER_CLIENT_ID;
-  const naverRedirectUri = process.env.REACT_APP_NAVER_REDIRECT_URL;
   const googleRedirectUri = process.env.REACT_APP_GOOGLE_REDIRECT_URL;
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -101,7 +98,6 @@ export default function Login() {
 
     window.location.href = kakaoURL;
   };
-  const handleNaverLogin = () => {};
 
   const handleGoogleLogin = () => {
     clearAuth();
@@ -172,7 +168,7 @@ export default function Login() {
 
   return (
     <div
-      className="min-h-screen w-screen bg-center bg-contain bg-no-repeat flex justify-center items-center"
+      className="min-h-screen w-screen bg-white bg-center bg-contain bg-no-repeat flex justify-center items-center"
       style={{
         backgroundImage: `url(${LoginBack})`,
       }}
@@ -229,12 +225,6 @@ export default function Login() {
             alt="kakao"
             className="w-1/8 cursor-pointer"
             onClick={handleKakaoLogin}
-          />
-          <img
-            src={Naver}
-            alt="kakao"
-            className="w-1/8 cursor-pointer"
-            onClick={handleNaverLogin}
           />
           <img
             src={Google}

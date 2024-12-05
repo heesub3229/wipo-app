@@ -78,7 +78,7 @@ export default function FindPw() {
 
   return (
     <div
-      className="min-h-screen w-screen bg-center bg-contain bg-no-repeat flex justify-center items-center"
+      className="min-h-screen w-screen bg-white bg-center bg-contain bg-no-repeat flex justify-center items-center"
       style={{
         backgroundImage: `url(${LoginBack})`,
       }}

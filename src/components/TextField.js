@@ -102,6 +102,10 @@ export const VerCodeInput = ({ text }) => {
     }
   };
 
+  const handleFocus = (index) => {
+    inputRefs.current[index].setSelectionRange(0, 1); // 전체 선택
+  };
+
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace") {
       const newInputs = [...inputs];
@@ -129,7 +133,8 @@ export const VerCodeInput = ({ text }) => {
           className="bg-white h-20 p-3 w-1/6 border rounded-md border-gray-300 ring-gray-600 focus:ring-2 focus:ring-gray-500 focus:outline-none font-nanum text-5xl text-center caret-transparent"
           placeholder="0"
           maxLength="1"
-          value={inputs[index]} // 상태로 입력값 관리
+          value={inputs[index]}
+          onFocus={() => handleFocus(index)}
           onChange={(e) => handleChange(e, index)}
           onKeyDown={(e) => handleKeyDown(e, index)}
         />

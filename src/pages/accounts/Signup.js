@@ -212,7 +212,7 @@ export default function Signup() {
         String(date).padStart(2, "0"),
     };
 
-    dispatch(asign(formData));
+    dispatch(asign(formData)).then(navigate("/"));
   };
 
   const validateType = (value, type) => {
@@ -234,7 +234,7 @@ export default function Signup() {
 
   return (
     <div
-      className="min-h-screen w-screen bg-center bg-contain bg-no-repeat flex justify-center items-center"
+      className="min-h-screen w-screen bg-white bg-center bg-contain bg-no-repeat flex justify-center items-center"
       style={{
         backgroundImage: `url(${LoginBack})`,
       }}

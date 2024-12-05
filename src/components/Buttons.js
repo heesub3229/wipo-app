@@ -114,7 +114,7 @@ export const SideBottomButton = ({
   );
 };
 
-export const IconButton = ({ icon: Icon, handleClick }) => {
+export const CalendarIconButton = ({ icon: Icon, handleClick }) => {
   return (
     <div
       className="p-2 rounded-full hover:bg-calendarHover flex justify-center items-center text-xl text-gray-600 mr-4 cursor-pointer"
@@ -135,5 +135,16 @@ export const VerifyButton = ({ text, handleClick }) => {
     >
       {text}
     </button>
+  );
+};
+
+export const IconButton = ({ icon: Icon, handleClick }) => {
+  return (
+    <div
+      className="p-1 rounded-full hover:bg-gray-200 flex justify-center items-center text-xl text-gray-600 cursor-pointer"
+      onClick={handleClick}
+    >
+      <Icon />
+    </div>
   );
 };
