@@ -6,6 +6,7 @@ import {
   FaRegCalendar,
   FaLocationDot,
   FaMagnifyingGlass,
+  FaTags,
 } from "react-icons/fa6";
 import RegionFile from "../../data/regionList.csv";
 import { fetchRegion } from "../../components/ReadCsv";
@@ -14,20 +15,62 @@ import { FilledButton, OutlinedButton } from "../../components/Buttons";
 import { useNavigate } from "react-router-dom";
 import { Modal } from "../../components/Modal";
 import SelectLocation from "./SelectLocation";
+import { UserSelect } from "../../components/DropDown";
+
+const userEx = [
+  { id: 1, userName: "짱구" },
+  { id: 2, userName: "맹구" },
+  { id: 3, userName: "철수" },
+  { id: 4, userName: "유리" },
+];
 
 export default function WritePost() {
   const [place, setPlace] = useState("");
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [date, setDate] = useState("");
+  const [user, setUser] = useState("");
+  const [userList, setUserList] = useState([]);
+  const [taggedUsers, setTaggedUsers] = useState([]);
   const [content, setContent] = useState("");
   const [imageArr, setImageArr] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const navigator = useNavigate();
 
+  useEffect(() => {
+    // 친구 목록 불러오기
+    setUserList(userEx);
+  }, []);
+
   const handleOpenDatePicker = () => {
     if (!openDatePicker) {
       setOpenDatePicker(true);
     }
+  };
+
+  const handleUserChange = (value) => {
+    setUser(value);
+  };
+
+  const addUserToTags = (userName) => {
+    // 기존 상태가 배열인지 확인 후 업데이트
+    setTaggedUsers((prev) => {
+      if (Array.isArray(prev)) {
+        // 중복 방지
+        return prev.includes(userName) ? prev : [...prev, userName];
+      } else {
+        return [userName]; // 잘못된 상태 초기화
+      }
+    });
+  };
+
+  const removeTag = (userName) => {
+    setTaggedUsers((prev) => {
+      if (Array.isArray(prev)) {
+        return prev.filter((tag) => tag !== userName);
+      } else {
+        return []; // 잘못된 상태 초기화
+      }
+    });
   };
 
   const handleOpenModal = () => {
@@ -79,22 +122,57 @@ export default function WritePost() {
             <OutlinedButton text="취소" handleClick={handleCancelClick} />
           </div>
         </div>
-        <div className="w-[800px] flex items-center mt-3">
-          <p className="text-nowrap font-nanum text-xl font-bold w-[100px]">
-            어디서
-          </p>
-          <div className="w-[350px]">
-            <TitleInput
-              startIcon={FaLocationDot}
-              handleClick={handleOpenModal}
-              endIcon={FaMagnifyingGlass}
-              value={place}
-              placeholder="장소를 검색해보세요"
-            />
-            <Modal isOpen={openModal} onClose={handleCloseModal}>
-              <SelectLocation setPlace={setPlace} />
-            </Modal>
+        <div className="flex">
+          <div className="w-[530px] flex items-center mt-3">
+            <p className="text-nowrap font-nanum text-xl font-bold w-[100px]">
+              어디서
+            </p>
+            <div className="w-[350px]">
+              <TitleInput
+                startIcon={FaLocationDot}
+                handleClick={handleOpenModal}
+                endIcon={FaMagnifyingGlass}
+                value={place}
+                placeholder="장소를 검색해보세요"
+              />
+              <Modal isOpen={openModal} onClose={handleCloseModal}>
+                <SelectLocation setPlace={setPlace} />
+              </Modal>
+            </div>
           </div>
+          {/* <div className="w-[800px] flex items-center mt-3">
+            <p className="text-nowrap font-nanum text-xl font-bold w-[100px]">
+              누구랑
+            </p>
+            <div className="w-[350px]">
+              <UserSelect
+                startIcon={FaTags}
+                value={user}
+                handleInputChange={handleUserChange}
+                placeholder="친구를 태그해보세요"
+                list={userList.filter(
+                  (item) => item.userName.includes(user) // 입력값으로 필터링
+                )}
+                setData={addUserToTags}
+              />
+              <div className="flex flex-wrap mt-2">
+                {taggedUsers.map((tag, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center px-3 py-1 m-1 bg-gray-200 rounded-full text-sm"
+                  >
+                    <span>{tag}</span>
+                    <button
+                      className="ml-2 text-gray-500 hover:text-gray-800"
+                      onClick={() => removeTag(tag)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div> */}
         </div>
         <FileUpload setImageArr={setImageArr} />
         <div className="mt-5">

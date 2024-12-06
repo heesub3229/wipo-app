@@ -1,87 +1,83 @@
 import React, { useEffect, useState } from "react";
 import { FaLocationDot, FaMagnifyingGlass, FaXmark } from "react-icons/fa6";
 import { LocationDropDown } from "../../components/DropDown";
+import { getSearchedPlaces } from "../../api/PlaceApi";
 import LocationPage from "./LocationPage";
-// import FavPlaces from "./FavPlaces";
-
-const autoEx = [
-  {
-    id: 1,
-    addressName: "서울 종로구 세종로 1-1",
-    placeName: "경복궁",
-  },
-  {
-    id: 2,
-    addressName: "서울 강북구 우이동 산 40-1",
-    placeName: "북한산둘레길 1구간소나무숲길",
-  },
-  {
-    id: 3,
-    addressName: "서울 서대문구 홍은동",
-    placeName: "북한산둘레길 7구간옛성길",
-  },
-];
+import Test from "./Test";
+import FavPlaces from "./FavPlaces";
 
 const locationEx = [
   {
     id: 1,
     addressName: "서울 종로구 세종로 1-1",
     placeName: "경복궁",
+    favFlag: "Y",
   },
   {
     id: 2,
     addressName: "서울 강북구 우이동 산 40-1",
     placeName: "북한산둘레길 1구간소나무숲길",
+    favFlag: "N",
   },
   {
     id: 3,
     addressName: "서울 서대문구 홍은동",
     placeName: "북한산둘레길 7구간옛성길",
+    favFlag: "N",
   },
   {
     id: 4,
     addressName: "서울 종로구 세종로 1-1",
     placeName: "경복궁",
+    favFlag: "Y",
   },
   {
     id: 5,
     addressName: "서울 강북구 우이동 산 40-1",
     placeName: "북한산둘레길 1구간소나무숲길",
+    favFlag: "N",
   },
   {
     id: 6,
     addressName: "서울 서대문구 홍은동",
     placeName: "북한산둘레길 7구간옛성길",
+    favFlag: "N",
   },
   {
     id: 7,
     addressName: "서울 종로구 세종로 1-1",
     placeName: "경복궁",
+    favFlag: "Y",
   },
   {
     id: 8,
     addressName: "서울 강북구 우이동 산 40-1",
     placeName: "북한산둘레길 1구간소나무숲길",
+    favFlag: "N",
   },
   {
     id: 9,
     addressName: "서울 서대문구 홍은동",
     placeName: "북한산둘레길 7구간옛성길",
+    favFlag: "N",
   },
   {
     id: 10,
     addressName: "서울 종로구 세종로 1-1",
     placeName: "경복궁",
+    favFlag: "Y",
   },
   {
     id: 11,
     addressName: "서울 강북구 우이동 산 40-1",
     placeName: "북한산둘레길 1구간소나무숲길",
+    favFlag: "N",
   },
   {
     id: 12,
     addressName: "서울 서대문구 홍은동",
     placeName: "북한산둘레길 7구간옛성길",
+    favFlag: "N",
   },
 ];
 
@@ -93,12 +89,18 @@ export default function SelectLocation({ onClose, setPlace }) {
   const [selectedLocation, setSelectedLocation] = useState("");
 
   useEffect(() => {
-    if (location === "") {
-      setAutoList([]);
-    } else {
-      //location 값으로 검색
-      setAutoList(autoEx);
-    }
+    const debounceTimeout = setTimeout(() => {
+      if (location === "") {
+        setAutoList([]);
+      } else {
+        // location 값으로 검색
+        getSearchedPlaces(location)
+          .then((result) => result && setAutoList(result))
+          .catch((error) => console.log(error));
+      }
+    }, 500); // 1.5초 대기
+
+    return () => clearTimeout(debounceTimeout);
   }, [location]);
 
   useEffect(() => {
@@ -119,6 +121,10 @@ export default function SelectLocation({ onClose, setPlace }) {
     setLocation(value);
   };
 
+  const handleSearch = () => {
+    // location에 담긴 값으로 검색
+  };
+
   return (
     <div className="w-[50vw] min-h-[80vh] max-h-[80vh] bg-white p-10 rounded-md shadow-lg flex flex-col justify-center items-center overflow-y-auto relative">
       <div className="absolute inset-0 w-full h-[4vh] bg-indigo-900 flex items-center justify-end px-2">
@@ -136,33 +142,27 @@ export default function SelectLocation({ onClose, setPlace }) {
             endIcon={FaMagnifyingGlass}
             placeholder="장소를 검색해보세요"
             handleInputChange={handleLocationChange}
+            clickEndIcon={handleSearch}
             list={autoList}
             setData={setSelectedData}
           />
         </div>
         <div className="w-full mt-10 h-[50vh] flex space-x-3 relative justify-center">
           <div className="border w-1/3 h-full flex flex-col">
-            <LocationPage
-              locationList={locationList}
-              setData={setSelectedLocation}
-            />
-            {/* {selectedData !== "" ? (
+            {selectedData !== "" ? (
               <LocationPage
                 locationList={locationList}
+                setLocationList={setLocationList}
                 setData={setSelectedLocation}
               />
             ) : (
               <FavPlaces setData={setSelectedLocation} />
-            )} */}
+            )}
           </div>
 
           <div className="border w-2/3">
             {/* 너무 횡해보여서 일단 넣어본 이미지 지도로 대체해주세여 */}
-            <img
-              className="w-full h-full"
-              src="https://i.namu.wiki/i/VeP1_Nyz7btM5HnLJJ7vkAjLITQcQk4ISx6GC13LRMH8cpBT3lrU1g15DYstyoBFpEqwYSZRS0Dvraes8pDkCg.webp"
-              alt="test"
-            />
+            <Test />
           </div>
         </div>
       </div>

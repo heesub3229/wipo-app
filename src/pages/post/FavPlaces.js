@@ -1,17 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IconButton } from "../../components/Buttons";
 import { FaAngleLeft, FaAngleRight, FaStar, FaRegStar } from "react-icons/fa6";
 
-const LocationPage = ({ locationList, setLocationList, setData }) => {
+const favEx = [
+  {
+    id: 1,
+    addressName: "서울 종로구 세종로 1-1",
+    placeName: "경복궁",
+    favFlag: "Y",
+  },
+  {
+    id: 2,
+    addressName: "서울 강북구 우이동 산 40-1",
+    placeName: "북한산둘레길 1구간소나무숲길",
+    favFlag: "Y",
+  },
+  {
+    id: 3,
+    addressName: "서울 서대문구 홍은동",
+    placeName: "북한산둘레길 7구간옛성길",
+    favFlag: "Y",
+  },
+];
+
+const FavPlaces = ({ setData }) => {
+  const [favList, setFavList] = useState([]);
   const [hoveredItemId, setHoveredItemId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = locationList.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = favList.slice(indexOfFirstItem, indexOfLastItem);
 
-  const totalPages = Math.ceil(locationList.length / itemsPerPage);
+  const totalPages = Math.ceil(favList.length / itemsPerPage);
 
   const handlePageChange = (page) => {
     if (page > 0 && page <= totalPages) {
@@ -19,21 +41,19 @@ const LocationPage = ({ locationList, setLocationList, setData }) => {
     }
   };
 
-  const handleFavClick = (id) => {
-    // 즐겨찾기 상태 변화
-    setLocationList((prevFavList) =>
-      prevFavList.map((favItem) =>
-        favItem.id === id
-          ? { ...favItem, favFlag: favItem.favFlag === "Y" ? "N" : "Y" }
-          : favItem
-      )
-    );
+  useEffect(() => {
+    // 즐겨찾기 리스트 불러오기
+    setFavList(favEx);
+  }, []);
+
+  const handleFavClick = () => {
+    // 즐겨찾기 해제
   };
 
   return (
     <>
       <div className="h-[90%] overflow-auto">
-        {Array.isArray(locationList) && locationList.length > 0 && (
+        {Array.isArray(favList) && favList.length > 0 ? (
           <>
             {currentItems.map((item) => (
               <div key={item.id} onClick={() => setData(item.placeName)}>
@@ -43,24 +63,12 @@ const LocationPage = ({ locationList, setLocationList, setData }) => {
                       className="text-yellow-300 cursor-pointer"
                       onMouseEnter={() => setHoveredItemId(item.id)}
                       onMouseLeave={() => setHoveredItemId(null)}
-                      onClick={() => handleFavClick(item.id)}
+                      onClick={() => handleFavClick()}
                     >
-                      {item.favFlag === "Y" ? (
-                        <>
-                          {hoveredItemId === item.id ? (
-                            <FaRegStar className="text-gray-700" />
-                          ) : (
-                            <FaStar />
-                          )}
-                        </>
+                      {hoveredItemId === item.id ? (
+                        <FaRegStar className="text-gray-700" />
                       ) : (
-                        <>
-                          {hoveredItemId === item.id ? (
-                            <FaStar />
-                          ) : (
-                            <FaRegStar className="text-gray-700" />
-                          )}
-                        </>
+                        <FaStar />
                       )}
                     </div>
 
@@ -72,6 +80,22 @@ const LocationPage = ({ locationList, setLocationList, setData }) => {
               </div>
             ))}
           </>
+        ) : (
+          <div>
+            <div className="w-full h-auto flex flex-col justify-center p-2 hover:bg-gray-200 cursor-pointer">
+              <div className="flex items-center space-x-3">
+                <div className="text-yellow-300">
+                  <FaStar />
+                </div>
+                <p>
+                  자주 가는 장소를
+                  <br />
+                  즐겨찾기로 등록해보세요.
+                </p>
+              </div>
+            </div>
+            <div className="w-full border-t"></div>
+          </div>
         )}
       </div>
       {totalPages > 1 && (
@@ -107,4 +131,4 @@ const LocationPage = ({ locationList, setLocationList, setData }) => {
   );
 };
 
-export default LocationPage;
+export default FavPlaces;

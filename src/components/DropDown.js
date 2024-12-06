@@ -122,7 +122,7 @@ export const LocationDropDown = ({
   setData,
   errFlag,
 }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const dropDownRef = useRef();
 
   useEffect(() => {
@@ -139,6 +139,16 @@ export const LocationDropDown = ({
     };
   }, []);
 
+  const handleOpen = () => {
+    setIsOpen((prev) => !prev);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      clickEndIcon();
+    }
+  };
+
   return (
     <div className="w-full relative z-50" ref={dropDownRef}>
       <div
@@ -153,17 +163,18 @@ export const LocationDropDown = ({
           value={value}
           placeholder={placeholder}
           onChange={(e) => handleInputChange(e.target.value)}
-          autoFocus
+          onClick={() => handleOpen()}
+          onKeyDown={handleKeyDown}
         />
         {EndIcon && (
           <EndIcon
-            className="text-gray-400 mr-2"
+            className="text-gray-400 mr-2 cursor-pointer"
             onClick={() => clickEndIcon()}
           />
         )}
       </div>
       {isOpen && Array.isArray(list) && list.length > 0 && (
-        <div className="absolute left-0 w-full max-h-60 overflow-y-auto p-2 mt-1 bg-white border rounded shadow-xl font-nanum">
+        <div className="absolute left-1/2 transform -translate-x-1/2 w-4/5 max-h-80 overflow-y-auto p-2 mt-1 bg-white border rounded shadow-xl font-nanum">
           {list.map((item, index) => (
             <div
               key={`place-${index}`}
@@ -175,6 +186,83 @@ export const LocationDropDown = ({
             >
               <p>{item.placeName}</p>
               <p className="text-sm">{item.addressName}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const UserSelect = ({
+  id,
+  value,
+  placeholder,
+  handleInputChange,
+  startIcon: StartIcon,
+  endIcon: EndIcon,
+  clickEndIcon,
+  list,
+  setData,
+  errFlag,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropDownRef = useRef();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropDownRef.current && !dropDownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleOpen = () => {
+    setIsOpen((prev) => !prev);
+  };
+
+  return (
+    <div className="w-full relative" ref={dropDownRef}>
+      <div
+        className={`flex items-center bg-white w-full p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none ${
+          errFlag ? "border-red-600" : "border-gray-300"
+        }`}
+      >
+        {StartIcon && <StartIcon className="text-gray-600 mr-3" />}
+        <input
+          className="w-full focus:outline-none font-nanum text-lg font-bold"
+          id={id}
+          value={value}
+          placeholder={placeholder}
+          onChange={(e) => handleInputChange(e.target.value)}
+          onClick={() => handleOpen()}
+        />
+        {EndIcon && (
+          <EndIcon
+            className="text-gray-400 mr-2 cursor-pointer"
+            onClick={() => clickEndIcon()}
+          />
+        )}
+      </div>
+      {isOpen && Array.isArray(list) && list.length > 0 && (
+        <div className="absolute left-0 w-full max-h-80 overflow-y-auto p-2 mt-1 bg-white border rounded shadow-xl font-nanum">
+          {list.map((item, index) => (
+            <div
+              key={`place-${index}`}
+              className="p-2 cursor-pointer hover:bg-gray-100"
+              onClick={() => {
+                setData(item.userName);
+                handleInputChange(""); // 입력창 초기화
+                setIsOpen(false);
+              }}
+            >
+              <p>{item.userName}</p>
             </div>
           ))}
         </div>

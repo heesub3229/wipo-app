@@ -186,7 +186,6 @@ export const TitleInput = ({
   handleClick,
   startIcon: StartIcon,
   endIcon: EndIcon,
-  clickEndIcon,
   errFlag,
 }) => {
   return (
@@ -204,12 +203,7 @@ export const TitleInput = ({
         onClick={handleClick}
         readOnly
       />
-      {EndIcon && (
-        <EndIcon
-          className="text-gray-400 mr-2 cursor-pointer"
-          onClick={() => clickEndIcon()}
-        />
-      )}
+      {EndIcon && <EndIcon className="text-gray-400 mr-2" />}
     </div>
   );
 };
