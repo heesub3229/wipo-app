@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { FaStar, FaRegStar } from "react-icons/fa6";
+
 export const AccountButton = ({ text }) => {
   return (
     <button
@@ -145,6 +148,40 @@ export const IconButton = ({ icon: Icon, handleClick }) => {
       onClick={handleClick}
     >
       <Icon />
+    </div>
+  );
+};
+
+export const FavButton = ({ id, favFlag }) => {
+  const [hoveredItemId, setHoveredItemId] = useState(null);
+
+  const handleFavClick = () => {
+    // 즐겨찾기 해제
+  };
+  return (
+    <div
+      className="text-yellow-300 cursor-pointer"
+      onMouseEnter={() => setHoveredItemId(id)}
+      onMouseLeave={() => setHoveredItemId(null)}
+      onClick={() => handleFavClick()}
+    >
+      {favFlag === "Y" ? (
+        <>
+          {hoveredItemId === id ? (
+            <FaRegStar className="text-gray-700" />
+          ) : (
+            <FaStar />
+          )}
+        </>
+      ) : (
+        <>
+          {hoveredItemId === id ? (
+            <FaStar />
+          ) : (
+            <FaRegStar className="text-gray-700" />
+          )}
+        </>
+      )}
     </div>
   );
 };
