@@ -37,7 +37,7 @@ export const Modal = ({ isOpen, onClose, children }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
       onClick={handleBackgroundClick}
     >
       {isValidElement(children)
