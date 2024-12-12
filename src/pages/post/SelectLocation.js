@@ -111,7 +111,7 @@ export default function SelectLocation({ onClose, setPlace }) {
 
   const selectLocation = (value) => {
     if (value) {
-      setPlace(value);
+      setPlace(value.placeName);
       setSelectedLocation(value);
     }
   };

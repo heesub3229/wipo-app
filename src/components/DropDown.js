@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { FaXmark } from "react-icons/fa6";
 
 export const LoginDropDown = React.memo(
   ({
@@ -196,7 +197,6 @@ export const LocationDropDown = ({
 
 export const UserSelect = ({
   id,
-  value,
   placeholder,
   handleInputChange,
   startIcon: StartIcon,
@@ -204,6 +204,8 @@ export const UserSelect = ({
   clickEndIcon,
   list,
   setData,
+  taggedUsers,
+  removeTag,
   errFlag,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -230,22 +232,74 @@ export const UserSelect = ({
   return (
     <div className="w-full relative" ref={dropDownRef}>
       <div
-        className={`flex items-center bg-white w-full p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none ${
+        className={`flex items-center flex-wrap bg-white w-full p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none ${
           errFlag ? "border-red-600" : "border-gray-300"
         }`}
+        onClick={handleOpen}
       >
         {StartIcon && <StartIcon className="text-gray-600 mr-3" />}
-        <input
-          className="w-full focus:outline-none font-nanum text-lg font-bold"
-          id={id}
-          value={value}
-          placeholder={placeholder}
-          onChange={(e) => handleInputChange(e.target.value)}
-          onClick={() => handleOpen()}
-        />
+        {taggedUsers.length === 0 && !isOpen && (
+          <div className="text-gray-400 font-nanum text-lg font-bold ml-2">
+            {placeholder}
+          </div>
+        )}
+        {isOpen ? (
+          <>
+            {taggedUsers.map((tag, index) => (
+              <div
+                key={index}
+                className="flex items-center px-3 py-1 bg-gray-200 rounded-full text-sm mr-1 mb-1"
+              >
+                <span>{tag}</span>
+                <button
+                  className="ml-2 text-gray-500 hover:text-gray-800"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeTag(tag);
+                  }}
+                >
+                  <FaXmark />
+                </button>
+              </div>
+            ))}
+
+            <input
+              className="flex-grow focus:outline-none font-nanum text-lg font-bold ml-2"
+              id={id}
+              onChange={(e) => handleInputChange(e.target.value)}
+              autoFocus
+            />
+          </>
+        ) : (
+          <>
+            {taggedUsers.slice(0, 2).map((tag, index) => (
+              <div
+                key={index}
+                className="flex items-center px-3 py-1 bg-gray-200 rounded-full text-sm mr-1"
+              >
+                <span>{tag}</span>
+                <button
+                  className="ml-2 bg-gray-400 hover:bg-gray-500 opacity-50 text-white rounded-full w-4 h-4 flex justify-center items-center text-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeTag(tag);
+                  }}
+                >
+                  <FaXmark />
+                </button>
+              </div>
+            ))}
+            {taggedUsers.length > 2 && (
+              <div className="flex items-center text-gray-500 text-sm m-1">
+                +{taggedUsers.length - 2}
+              </div>
+            )}
+          </>
+        )}
+
         {EndIcon && (
           <EndIcon
-            className="text-gray-400 mr-2 cursor-pointer"
+            className="text-gray-400 ml-2 cursor-pointer"
             onClick={() => clickEndIcon()}
           />
         )}
@@ -258,7 +312,7 @@ export const UserSelect = ({
               className="p-2 cursor-pointer hover:bg-gray-100"
               onClick={() => {
                 setData(item.userName);
-                handleInputChange(""); // 입력창 초기화
+                handleInputChange("");
                 setIsOpen(false);
               }}
             >
