@@ -1,4 +1,8 @@
 import moment from "moment-timezone";
+import MarkedPlace from "../pages/post/MarkedPlace";
+import ReactDOMServer from "react-dom/server";
+const place = new window.kakao.maps.services.Places();
+const geocoder = new window.kakao.maps.services.Geocoder();
 
 export const generateState = () => {
   return (
@@ -18,4 +22,248 @@ export const changeDateStr = (year, month, date) => {
     String(month).padStart(2, "0") +
     String(date).padStart(2, "0")
   );
+};
+
+export const kakaoSearchKeyword = (search, count) => {
+  return new Promise((resolve, reject) => {
+    if (window.kakao && window.kakao.maps) {
+      const searchCallback = (data, status, pagination) => {
+        if (status === window.kakao.maps.services.Status.OK) {
+          const array = data.map((item, index) => ({
+            id: index + (count ? count : 0),
+            placeName: item.place_name,
+            addressName: item.address_name,
+            x: item.x,
+            y: item.y,
+            region_1depth_name: "",
+            region_2depth_name: "",
+            region_3depth_name: "",
+            favFlag: "N",
+            type: "K",
+          }));
+          resolve({ data: array, page: pagination }); // 모든 결과 반환
+        } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
+          resolve([]); // 결과 없음
+        } else {
+          if (status) {
+            reject(status);
+          } else {
+            reject(data);
+          }
+        }
+      };
+
+      place.keywordSearch(search, searchCallback, { size: 10 }); // 첫 검색 요청
+    } else {
+      reject("");
+    }
+  });
+};
+
+export const kakaoNextPage = (search, nextPage, originCount) => {
+  return new Promise((resolve, reject) => {
+    if (window.kakao && window.kakao.maps) {
+      const searchCallback = (data, status, pagination) => {
+        if (status === window.kakao.maps.services.Status.OK) {
+          const array = data.map((item, index) => ({
+            id: index + originCount + (nextPage - 1) * 10,
+            placeName: item.place_name,
+            addressName: item.address_name,
+            x: item.x,
+            y: item.y,
+            region_1depth_name: "",
+            region_2depth_name: "",
+            region_3depth_name: "",
+            favFlag: "N",
+            type: "K",
+          }));
+          resolve({ data: array, page: pagination }); // 모든 결과 반환
+        } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
+          resolve([]); // 결과 없음
+        } else {
+          if (status) {
+            reject(status);
+          } else {
+            reject(data);
+          }
+        }
+      };
+
+      place.keywordSearch(search, searchCallback, { size: 10, page: nextPage }); // 첫 검색 요청
+    } else {
+      reject("");
+    }
+  });
+};
+
+export const kakaoSearchAddress = (search) => {
+  return new Promise((resolve, reject) => {
+    if (window.kakao && window.kakao.maps) {
+      const searchCallback = (data, status, pagination) => {
+        if (status === window.kakao.maps.services.Status.OK) {
+          const filterArray = data.filter((item) =>
+            item.address ? item : item.road_address.road_name === search
+          );
+          const array = filterArray.map((item, index) => ({
+            id: index,
+            placeName: item.address
+              ? item.address.address_name
+              : item.road_address?.road_name,
+            addressName: item.address
+              ? item.address.address_name
+              : item.road_address?.address_name,
+            x: item.address ? item.address.x : item.road_address?.x,
+            y: item.address ? item.address.y : item.road_address?.y,
+            region_1depth_name: item.address
+              ? item.address.region_1depth_name
+              : item.road_address?.region_1depth_name,
+            region_2depth_name: item.address
+              ? item.address.region_2depth_name
+              : item.road_address?.region_2depth_name,
+            region_3depth_name: item.address
+              ? item.address.region_3depth_name
+              : item.road_address?.region_3depth_name,
+            favFlag: "N",
+            type: item.address ? "A" : "R",
+          }));
+
+          const pageData = {
+            ...pagination,
+            totalCount: array.length,
+            last: 1,
+            hasNextPage: false,
+          };
+
+          resolve({ data: array, page: pageData }); // 모든 결과 반환
+        } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
+          resolve([]); // 결과 없음
+        } else {
+          if (status) {
+            reject(status);
+          } else {
+            reject(data);
+          }
+        }
+      };
+      geocoder.addressSearch(search, searchCallback, {
+        size: 10,
+      });
+    } else {
+      reject("");
+    }
+  });
+};
+
+export const getCurrentLoc = () => {
+  return new Promise((resolve, reject) => {
+    if (window.kakao && window.kakao.maps) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+
+          resolve({ lat: lat, lon: lon });
+        });
+      } else {
+        resolve({ lat: 33.450701, lon: 126.570667 });
+      }
+    } else {
+      resolve({ lat: 33.450701, lon: 126.570667 });
+    }
+  });
+};
+
+export const getLocToAddr = (lat, lon) => {
+  return new Promise((resolve, reject) => {
+    if (window.kakao && window.kakao.maps) {
+      geocoder.coord2Address(lon, lat, function (result, status) {
+        if (status === window.kakao.maps.services.Status.OK) {
+          const address = result[0].address.address_name;
+          resolve(address);
+        } else {
+          reject(null);
+        }
+      });
+    } else {
+      reject(null);
+    }
+  });
+};
+
+export const setKakaoDefault = async (mapContainer) => {
+  const loc = await getCurrentLoc();
+  const mapOptions = {
+    center: new window.kakao.maps.LatLng(loc.lat, loc.lon),
+    level: 5,
+  };
+  const map = new window.kakao.maps.Map(mapContainer, mapOptions);
+
+  const marker = new window.kakao.maps.Marker({
+    map: map,
+    position: new window.kakao.maps.LatLng(loc.lat, loc.lon),
+  });
+
+  marker.setMap(map);
+  // const polygon = new window.kakao.maps.Polygon({
+  //   map: map,
+  // });
+  // polygon.setMap(map);
+  const place = new window.kakao.maps.services.Places();
+  const geocoder = new window.kakao.maps.services.Geocoder();
+
+  return {
+    map: map,
+    marker: marker,
+    place: place,
+    geocoder: geocoder,
+  };
+};
+
+export const setArea = async (map, path) => {
+  const polygon = new window.kakao.maps.Polygon({
+    path: path,
+    strokeWeight: 2,
+    strokeColor: "#FF0000", // 경계선 색상
+    strokeOpacity: 0.8, // 경계선 투명도
+    strokeStyle: "solid",
+    fillColor: "#FF4500", // 내부 채우기 색상
+    fillOpacity: 0.4, // 내부 채우기 투명도
+  });
+  polygon.setMap(map);
+  return polygon;
+};
+
+export const setMarker = async (map, loc, level) => {
+  const mapOptions = new window.kakao.maps.LatLng(loc.y, loc.x);
+  map.setCenter(mapOptions);
+  const marker = new window.kakao.maps.Marker({
+    map: map,
+    position: mapOptions,
+  });
+  marker.setMap(map);
+  map.setLevel(level);
+  return marker;
+};
+
+export const setInfo = async (map, markers, placeName, loc) => {
+  const mapOptions = new window.kakao.maps.LatLng(loc.y, loc.x);
+  const info = ReactDOMServer.renderToString(
+    <MarkedPlace
+      data={{
+        favFlag: loc.favFlag,
+        placeName: placeName,
+        addressName: loc.addressName,
+      }}
+    />
+  );
+  const infoWindow = new window.kakao.maps.InfoWindow({
+    map: map,
+    position: mapOptions,
+    content: info,
+  });
+
+  // 마커와 연결하여 InfoWindow 표시
+  infoWindow.open(map, markers);
+
+  return infoWindow;
 };

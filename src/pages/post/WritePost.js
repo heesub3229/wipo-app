@@ -25,7 +25,7 @@ const userEx = [
 ];
 
 export default function WritePost() {
-  const [place, setPlace] = useState("");
+  const [place, setPlace] = useState({});
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [date, setDate] = useState("");
   const [user, setUser] = useState("");
@@ -132,7 +132,7 @@ export default function WritePost() {
                 startIcon={FaLocationDot}
                 handleClick={handleOpenModal}
                 endIcon={FaMagnifyingGlass}
-                value={place}
+                value={place?.placeName ? place.placeName : ""}
                 placeholder="장소를 검색해보세요"
               />
               <Modal isOpen={openModal} onClose={handleCloseModal}>
