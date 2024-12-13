@@ -4,7 +4,7 @@ import ReactDOMServer from "react-dom/server";
 const place = new window.kakao.maps.services.Places();
 const geocoder = new window.kakao.maps.services.Geocoder();
 
-export const generateState = () => {
+export const generateState = async () => {
   return (
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15)
