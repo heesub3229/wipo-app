@@ -11,8 +11,7 @@ export default function FileUpload({ setImageArr }) {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    const newImages = files.map((file) => URL.createObjectURL(file));
-    setImages((prevImages) => [...prevImages, ...newImages]);
+    setImages((prevImages) => [...prevImages, ...files]);
   };
 
   const handleImageRemove = (index) => {
@@ -50,7 +49,7 @@ export default function FileUpload({ setImageArr }) {
           {images.map((src, index) => (
             <div key={index} className="relative flex-shrink-0">
               <img
-                src={src}
+                src={URL.createObjectURL(src)}
                 alt={`uploaded-${index}`}
                 className="w-32 h-32 object-cover rounded-lg"
               />

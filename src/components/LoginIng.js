@@ -147,6 +147,7 @@ export const saveUser = createAsyncThunk(
       if (status === 200 && data?.data) {
         dispatch(
           saveUserInfo({
+            userSid: data?.data?.sid,
             email: data?.data?.email,
             dateBirth: data?.data?.dateBirth,
             name: data?.data?.name,

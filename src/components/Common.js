@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearState } from "../slices/api";
 import { delError } from "../slices/error";
 import moment from "moment-timezone";
+import { useNavigate } from "react-router-dom";
 
 export const Divider = ({ text }) => {
   return (
@@ -43,9 +44,14 @@ export const Error = () => {
   const error = useSelector((state) => Object.entries(state.error) || {});
   const dispatch = useDispatch();
   const [errors, setErrors] = useState([]);
+  const navigate = useNavigate();
+
   useEffect(() => {
     error.forEach(([key, value]) => {
       if (key) {
+        if (value.status === 401) {
+          navigate("/");
+        }
         addError(key, value);
       }
     });

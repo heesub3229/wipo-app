@@ -14,6 +14,8 @@ import { useNavigate } from "react-router-dom";
 import { Modal } from "../../components/Modal";
 import SelectLocation from "./SelectLocation";
 import { UserSelect } from "../../components/DropDown";
+import { useDispatch, useSelector } from "react-redux";
+import { postSave } from "../../api/PostApi";
 
 const userEx = [
   { id: 1, userName: "신짱구" },
@@ -33,6 +35,8 @@ export default function WritePost() {
   const [imageArr, setImageArr] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const navigator = useNavigate();
+  const dispatch = useDispatch();
+  const authJwtState = useSelector((state) => state.auth.jwtToken);
 
   useEffect(() => {
     // 친구 목록 불러오기
@@ -81,7 +85,25 @@ export default function WritePost() {
     setContent(value);
   };
 
-  const handleSaveClick = () => {};
+  const handleSaveClick = async () => {
+    const formData = new FormData();
+
+    const param = {
+      date: date,
+      content: content,
+      map: place,
+      userSidArray: [],
+    };
+    formData.append(
+      "data",
+      new Blob([JSON.stringify(param)], { type: "application/json" })
+    );
+    imageArr.forEach((item) => formData.append("files", item));
+    const retData = await dispatch(
+      postSave({ jwt: authJwtState, formData: formData })
+    );
+    console.log(retData);
+  };
 
   const handleCancelClick = () => {
     navigator("/Main");
@@ -128,7 +150,7 @@ export default function WritePost() {
                 startIcon={FaLocationDot}
                 handleClick={handleOpenModal}
                 endIcon={FaMagnifyingGlass}
-                value={place}
+                value={place?.placeName ? place?.placeName : ""}
                 placeholder="장소를 검색해보세요"
               />
               <Modal isOpen={openModal} onClose={handleCloseModal}>

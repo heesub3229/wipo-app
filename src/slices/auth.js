@@ -6,6 +6,8 @@ const initialState = {
   dateBirth: null,
   name: null,
   loginType: null,
+  userSid: null,
+  friendArray: [],
 };
 
 const authSlice = createSlice({
@@ -23,9 +25,11 @@ const authSlice = createSlice({
       state.dateBirth = null;
       state.name = null;
       state.loginType = null;
+      state.userSid = null;
     },
     saveUserInfo: (state, action) => {
-      const { email, dateBirth, name } = action.payload;
+      const { email, dateBirth, name, userSid } = action.payload;
+      state.userSid = userSid;
       state.dateBirth = dateBirth;
       state.email = email;
       state.name = name;

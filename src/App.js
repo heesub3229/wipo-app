@@ -30,9 +30,9 @@ function App() {
           <Route path="/google" element={<GoogleLogin />} />
           <Route path="/Main" element={<Main />} />
         </Routes>
+        <Loading />
+        <Error />
       </BrowserRouter>
-      <Loading />
-      <Error />
     </Provider>
   );
 }
