@@ -1,4 +1,5 @@
 import { useEffect, cloneElement, isValidElement } from "react";
+import { createPortal } from "react-dom";
 
 export const Modal = ({ isOpen, onClose, children }) => {
   const preventScroll = () => {
@@ -35,7 +36,7 @@ export const Modal = ({ isOpen, onClose, children }) => {
     }
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
       onClick={handleBackgroundClick}
@@ -43,6 +44,7 @@ export const Modal = ({ isOpen, onClose, children }) => {
       {isValidElement(children)
         ? cloneElement(children, { onClose }) // onClose를 children에 전달
         : children}
-    </div>
+    </div>,
+    document.body
   );
 };

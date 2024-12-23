@@ -153,16 +153,98 @@ export const UnderLineInput = ({
   endIcon: EndIcon,
   clickEndIcon,
   errFlag,
+  textSize,
+  readOnly,
 }) => {
   return (
     <div
-      className={`flex items-center mt-3 bg-white w-full p-3 border-b focus-within:border-b-2 focus-within:border-gray-500 ${
+      className={`flex items-center mt-3 w-full p-3 border-b focus-within:border-b-2 focus-within:border-gray-500 ${textSize} ${
         errFlag ? "border-red-600" : "border-gray-300"
       }`}
     >
-      {StartIcon && <StartIcon className="text-gray-400 mr-2" />}
+      {StartIcon && <StartIcon className="text-gray-400 mr-3" />}
       <input
-        className="w-full focus:outline-none font-nanum text-sm"
+        className={`w-full focus:outline-none font-nanum bg-transparent ${
+          textSize ? textSize : "text-sm"
+        }`}
+        type={type ? type : "text"}
+        id={id}
+        value={value}
+        onChange={(e) => handleInputChange(e.target.value)}
+        placeholder={placeholder}
+        readOnly={readOnly}
+      />
+      {EndIcon && (
+        <EndIcon
+          className="text-gray-400 mr-2 cursor-pointer"
+          onClick={() => clickEndIcon()}
+        />
+      )}
+    </div>
+  );
+};
+
+export const UnderLineInputW = ({
+  id,
+  value,
+  placeholder,
+  type,
+  handleInputChange,
+  startIcon: StartIcon,
+  endIcon: EndIcon,
+  clickEndIcon,
+  textSize,
+  readOnly,
+}) => {
+  return (
+    <div
+      className={`flex items-center mt-3 w-full p-3 border-b focus-within:border-b-2 border-gray-50 focus-within:border--gray-50 ${textSize}`}
+    >
+      {StartIcon && <StartIcon className="text-white mr-3" />}
+      <input
+        className={`w-full focus:outline-none text-white bg-transparent ${
+          textSize ? textSize : "text-sm"
+        }`}
+        type={type ? type : "text"}
+        id={id}
+        value={value}
+        onChange={(e) => handleInputChange(e.target.value)}
+        placeholder={placeholder}
+        readOnly={readOnly}
+      />
+      {EndIcon && (
+        <EndIcon
+          className="text-white mr-2 cursor-pointer"
+          onClick={() => clickEndIcon()}
+        />
+      )}
+    </div>
+  );
+};
+
+export const UnderLineDateInput = ({
+  id,
+  value,
+  placeholder,
+  type,
+  handleInputChange,
+  startIcon: StartIcon,
+  endIcon: EndIcon,
+  clickEndIcon,
+  errFlag,
+  textSize,
+}) => {
+  return (
+    <div
+      className={`flex items-center mt-3 bg-white w-full p-3 border-b focus-within:border-b-2 focus-within:border-gray-500 ${textSize} ${
+        errFlag ? "border-red-600" : "border-gray-300"
+      }`}
+    >
+      {StartIcon && <StartIcon className="text-gray-400 mr-3" />}
+      <input
+        className={`w-full focus:outline-none font-nanum ${
+          textSize ? textSize : "text-sm"
+        }`}
         type={type ? type : "text"}
         id={id}
         value={value}

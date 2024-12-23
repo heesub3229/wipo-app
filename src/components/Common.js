@@ -122,3 +122,85 @@ export const Error = () => {
     </div>
   );
 };
+
+export const formatFullDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString.split("[")[0]);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // 월은 0부터 시작하므로 +1
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${year}. ${month}. ${day} ${hours}:${minutes}`;
+};
+
+export const formatDate = (dateString, type) => {
+  if (!dateString) return "";
+
+  const year = dateString.slice(0, 4);
+  const month = dateString.slice(4, 6);
+  const day = dateString.slice(6, 8);
+
+  if (type === "dot") {
+    return `${year}. ${month}. ${day}`;
+  } else if (type === "birth") {
+    return `${year} . ${month} . ${day}`;
+  } else if (type === "kr") {
+    return `${year}년 ${month}월 ${day}일`;
+  } else {
+    return `${year}-${month}-${day}`;
+  }
+};
+
+export const formatTime = (createTime) => {
+  const isoString = createTime.split("[")[0];
+  const now = new Date();
+  const postTime = new Date(isoString);
+  const diffInSeconds = Math.floor((now - postTime) / 1000);
+
+  if (diffInSeconds < 60) {
+    return "방금 전";
+  }
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes}분 전`;
+  }
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) {
+    return `${diffInHours}시간 전`;
+  }
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 30) {
+    return `${diffInDays}일 전`;
+  }
+
+  const diffInMonths = Math.floor(diffInDays / 30);
+  if (diffInMonths < 12) {
+    return `${diffInMonths}달 전`;
+  }
+
+  const diffInYears = Math.floor(diffInDays / 365);
+  return `${diffInYears}년 전`;
+};
+
+export const ToggleBtn = ({ isOn, handleToggle }) => {
+  return (
+    <div
+      className={`w-14 h-7 flex items-center rounded-full p-1 cursor-pointer transition-colors ${
+        isOn ? "bg-indigo-500" : "bg-indigo-200"
+      }`}
+      onClick={handleToggle}
+    >
+      <div
+        className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform ${
+          isOn ? "translate-x-7" : "translate-x-0"
+        }`}
+      ></div>
+    </div>
+  );
+};

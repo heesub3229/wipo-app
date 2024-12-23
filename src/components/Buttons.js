@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaStar, FaRegStar } from "react-icons/fa6";
+import { FaStar, FaRegStar, FaXmark } from "react-icons/fa6";
 
 export const AccountButton = ({ text }) => {
   return (
@@ -120,8 +120,8 @@ export const SideBottomButton = ({
 export const CalendarIconButton = ({ icon: Icon, handleClick }) => {
   return (
     <div
-      className="p-2 rounded-full hover:bg-calendarHover flex justify-center items-center text-xl text-gray-600 mr-4 cursor-pointer"
-      onClick={handleClick}
+      className="p-2 rounded-full hover:bg-gray-100 flex justify-center items-center text-xl text-gray-700 cursor-pointer"
+      onClick={() => handleClick()}
     >
       <Icon />
     </div>
@@ -182,6 +182,17 @@ export const FavButton = ({ id, favFlag }) => {
           )}
         </>
       )}
+    </div>
+  );
+};
+
+export const CancelBtn = ({ handleClick }) => {
+  return (
+    <div
+      className="w-8 h-8 bg-gray-400 text-gray-50 text-lg opacity-50 hover:text-white hover:opacity-80 flex items-center justify-center rounded-full cursor-pointer"
+      onClick={() => handleClick()}
+    >
+      <FaXmark />
     </div>
   );
 };
