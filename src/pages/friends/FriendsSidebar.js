@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FaUserGroup, FaUserPlus, FaMagnifyingGlass } from "react-icons/fa6";
 import { UnderLineInputW } from "../../components/TextField";
 import FriendsList from "./FriendsList";
+import AddFriends from "./AddFriends";
 
 const friendsEx = [
   {
@@ -73,10 +74,15 @@ const friendsEx = [
 export default function FriendsSideBar({ isOpen, setIsOpen }) {
   const [friends, setFriends] = useState([]);
   const [searchData, setSearchData] = useState("");
+  const [addFriendsOpen, setAddFriendsOpen] = useState(false);
 
   useEffect(() => {
     setFriends(friendsEx);
   }, []);
+
+  useEffect(() => {
+    setAddFriendsOpen(false);
+  }, [isOpen]);
 
   const preventScroll = () => {
     const currentScrollY = window.scrollY;
@@ -107,6 +113,10 @@ export default function FriendsSideBar({ isOpen, setIsOpen }) {
   const handleSearchDataChange = (value) => {
     setSearchData(value);
   };
+
+  const handleAddFriendClick = () => {
+    setAddFriendsOpen((prev) => !prev);
+  };
   return (
     <>
       <div
@@ -132,7 +142,10 @@ export default function FriendsSideBar({ isOpen, setIsOpen }) {
               <p className="text-base">( {friends.length} )</p>
             </div>
           </div>
-          <div className="text-2xl p-2 hover:bg-white hover:bg-opacity-20 rounded-full cursor-pointer">
+          <div
+            className="text-2xl p-2 hover:bg-white hover:bg-opacity-20 rounded-full cursor-pointer"
+            onClick={() => handleAddFriendClick()}
+          >
             <FaUserPlus />
           </div>
         </div>
@@ -144,6 +157,7 @@ export default function FriendsSideBar({ isOpen, setIsOpen }) {
         <div className="mt-5 w-full flex justify-center overflow-auto">
           <FriendsList friends={friends} />
         </div>
+        <AddFriends isOpen={addFriendsOpen} setIsOpen={setAddFriendsOpen} />
       </div>
     </>
   );

@@ -1,52 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { FaUser, FaRegEnvelope, FaCakeCandles } from "react-icons/fa6";
+import {
+  FaUser,
+  FaUserPlus,
+  FaRegEnvelope,
+  FaCakeCandles,
+} from "react-icons/fa6";
 import { CancelBtn } from "../../components/Buttons";
 import { formatDate } from "../../components/Common";
-
-const userInfoEx = [
-  {
-    userSid: 1,
-    userName: "이주영",
-    userEmail: "juyoung05@hanmail.net",
-    userBirthday: "20000509",
-    userPosting: 15,
-    userFollowing: 106,
-  },
-  {
-    userSid: 2,
-    userName: "김희섭",
-    userEmail: "heesub3229@naver.com",
-    userBirthday: "19901204",
-    userPosting: 1,
-    userFollowing: 12,
-  },
-  {
-    userSid: 3,
-    userName: "흰둥이",
-    userEmail: "siro@google.com",
-    userBirthday: "20210505",
-    userPosting: 125,
-    userFollowing: 1006,
-  },
-];
-
-const profileImgEx = [
-  {
-    id: 1,
-    userSid: 1,
-    url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyPkxMuo6NOHcNx-aO-wOo3eyVnB2oTq-ZwA&s",
-  },
-  {
-    id: 2,
-    userSid: 2,
-    url: "",
-  },
-  {
-    id: 3,
-    userSid: 3,
-    url: "https://dthezntil550i.cloudfront.net/si/latest/si2106191619359450018996635/b78c82b7-7c14-478f-bf70-1f326e613718.png",
-  },
-];
 
 export default function Profile({ info, onClose }) {
   const [profileImg, setProfileImg] = useState("");
@@ -70,7 +30,11 @@ export default function Profile({ info, onClose }) {
         )}
       </div>
       <div className="pt-[250px] ">
-        <p className="pl-[270px] font-bold text-2xl">{info.name}</p>
+        <div className="flex items-center space-x-4">
+          <p className="pl-[270px] font-bold text-2xl">{info.name}</p>
+          {/* 친구가 아니면 */}
+          <FaUserPlus className="text-2xl text-gray-500 hover:text-gray-700 cursor-pointer" />
+        </div>
         <div className="mt-[80px] w-full flex justify-center items-center">
           <div className="w-4/5">
             <div className="flex items-center mt-3 bg-white w-full p-3 border-b text-lg">

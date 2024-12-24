@@ -149,6 +149,7 @@ export const UnderLineInput = ({
   placeholder,
   type,
   handleInputChange,
+  keyDownEvent,
   startIcon: StartIcon,
   endIcon: EndIcon,
   clickEndIcon,
@@ -156,6 +157,11 @@ export const UnderLineInput = ({
   textSize,
   readOnly,
 }) => {
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      keyDownEvent();
+    }
+  };
   return (
     <div
       className={`flex items-center mt-3 w-full p-3 border-b focus-within:border-b-2 focus-within:border-gray-500 ${textSize} ${
@@ -171,6 +177,7 @@ export const UnderLineInput = ({
         id={id}
         value={value}
         onChange={(e) => handleInputChange(e.target.value)}
+        onKeyDown={(e) => handleKeyDown(e)}
         placeholder={placeholder}
         readOnly={readOnly}
       />
