@@ -2,34 +2,64 @@ import React, { useEffect, useRef, useState } from "react";
 import { formatDate } from "../../components/Common";
 import { Modal } from "../../components/Modal";
 import Notice from "./Notice";
+import Profile from "../myPage/Profile";
 
 const alertEx = [
   {
-    alertSid: 1,
+    sid: 1,
     title: "공지",
     content: "2024. 12. 9 업데이트 내용에 대해 공지드립니다.",
     date: "20241209",
-    readFlag: "N",
+    type: "A",
+    confirmFlag: "N",
   },
   {
-    alertSid: 2,
+    sid: 2,
     title: "공지",
     content: "2024. 12. 9 업데이트 내용에 대해 공지드립니다.",
     date: "20241209",
-    readFlag: "N",
+    type: "A",
+    confirmFlag: "N",
   },
   {
-    alertSid: 3,
+    sid: 3,
     title: "공지",
     content: "2024. 12. 9 업데이트 내용에 대해 공지드립니다.",
     date: "20241209",
-    readFlag: "N",
+    type: "A",
+    confirmFlag: "N",
+  },
+  {
+    sid: 4,
+    title: "친구 요청",
+    content: "이주영님에게 온 친구 요청이 있습니다.",
+    date: "20241209",
+    type: "F",
+    confirmFlag: "N",
+  },
+  {
+    sid: 5,
+    title: "게시물 태그",
+    content: "이주영님이 게시물에 회원님을 태그했습니다.",
+    date: "20241209",
+    type: "P",
+    confirmFlag: "N",
+  },
+  {
+    sid: 6,
+    title: "친구 요청",
+    content: "이주영님에게 보낸 친구 요청이 수락되었습니다.",
+    date: "20241209",
+    type: "FA",
+    confirmFlag: "N",
   },
 ];
 
 export default function Alert({ isClosing, onClose }) {
   const [alertList, setAlertList] = useState([]);
   const [selectedAlertSid, setSelectedAlertSid] = useState(null);
+  const [openNotice, setOpenNotice] = useState(false);
+  const [openFriendReq, setOpenFriendReq] = useState(false);
   const alertRef = useRef();
 
   useEffect(() => {
@@ -54,17 +84,30 @@ export default function Alert({ isClosing, onClose }) {
     };
   }, [selectedAlertSid]);
 
-  const handleAlertClick = (alertSid) => {
+  const handleAlertClick = (sid, type) => {
     setAlertList((prev) =>
       prev.map((alert) =>
-        alert.alertSid === alertSid ? { ...alert, readFlag: "Y" } : alert
+        alert.sid === sid ? { ...alert, confirmFlag: "Y" } : alert
       )
     );
-    setSelectedAlertSid(alertSid);
+
+    setSelectedAlertSid(sid);
+
+    if (type === "A") {
+      setOpenNotice(true);
+    } else if (type === "F") {
+      setOpenFriendReq(true);
+    }
   };
 
   const handleCloseNotice = () => {
     setSelectedAlertSid(null);
+    setOpenNotice(false);
+  };
+
+  const handleCloseProfile = () => {
+    setSelectedAlertSid(null);
+    setOpenFriendReq(false);
   };
 
   return (
@@ -80,15 +123,15 @@ export default function Alert({ isClosing, onClose }) {
           {alertList.map((item) => (
             <div
               className="relative"
-              key={item.alertSid}
+              key={item.sid}
               onClick={() => {
-                handleAlertClick(item.alertSid);
+                handleAlertClick(item.sid, item.type);
               }}
             >
               <div className="w-full h-auto flex flex-col justify-center px-2 py-4  hover:bg-indigo-100 select-none">
                 <div className="flex">
                   <p className="text-base">{item.title}</p>
-                  {item.readFlag === "N" && (
+                  {item.confirmFlag === "N" && (
                     <div className="w-2 h-2 rounded-full bg-red-500 ml-1 mt-[2px]" />
                   )}
                 </div>
@@ -102,8 +145,13 @@ export default function Alert({ isClosing, onClose }) {
           ))}
         </div>
       </div>
-      <Modal isOpen={!!selectedAlertSid} onClose={handleCloseNotice}>
+
+      <Modal isOpen={openNotice} onClose={handleCloseNotice}>
         <Notice />
+      </Modal>
+
+      <Modal isOpen={openFriendReq} onClose={handleCloseProfile}>
+        <Profile />
       </Modal>
     </div>
   );
