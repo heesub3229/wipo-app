@@ -12,18 +12,13 @@ import {
 import { CancelBtn } from "../../components/Buttons";
 import { formatDate } from "../../components/Common";
 
-export default function Profile({ info, onClose }) {
+export default function Profile({ info, type, onClose }) {
   const [profileImg, setProfileImg] = useState("");
 
   return (
     <div className="relative w-[500px] h-[680px] bg-white mt-5 shadow-md rounded-md">
       <div className="absolute w-full bg-purple-200 h-[220px] rounded-t-md px-2 pt-2 flex justify-end space-x-1">
         <CancelBtn handleClick={onClose} />
-        <div className="absolute font-bold bottom-2 right-1 space-x-1 flex items-center">
-          <p className="mr-1">친구 요청 수락</p>
-          <FaCheck className="w-7 h-7 rounded-full p-1 hover:bg-white hover:bg-opacity-30 text-lg text-green-700 flex justify-center items-center cursor-pointer" />
-          <FaXmark className="w-7 h-7 rounded-full p-1 hover:bg-gray-200 text-lg text-red-700 flex justify-center items-center cursor-pointer" />
-        </div>
       </div>
 
       <div className="absolute w-52 h-52 bg-white rounded-full shadow-md top-32 left-5 flex justify-center items-center">
@@ -42,10 +37,15 @@ export default function Profile({ info, onClose }) {
       <div className="pt-[250px] ">
         <div className="flex items-center space-x-4">
           <p className="pl-[270px] font-bold text-2xl">{info.name}</p>
-          {/* 친구가 아니면 */}
-          <FaUserPlus className="text-2xl text-gray-500 hover:text-gray-700 cursor-pointer" />
-          {/* 친구 요청이 왔으면 */}
-          {/* <FaUserCheck className="text-2xl text-gray-500 hover:text-gray-700 cursor-pointer" /> */}
+          {type === "S" && (
+            <FaUserPlus className="text-2xl text-gray-500 hover:text-gray-700 cursor-pointer" />
+          )}
+          {type === "R" && (
+            <div className="flex space-x-1">
+              <FaCheck className="w-7 h-7 rounded-full p-1 hover:bg-gray-200 text-lg text-green-700 flex justify-center items-center cursor-pointer" />
+              <FaXmark className="w-7 h-7 rounded-full p-1 hover:bg-gray-200 text-lg text-red-700 flex justify-center items-center cursor-pointer" />
+            </div>
+          )}
         </div>
         <div className="mt-[80px] w-full flex justify-center items-center">
           <div className="w-4/5">
@@ -70,11 +70,6 @@ export default function Profile({ info, onClose }) {
           </div>
         </div>
       </div>
-      {/* <div className="absolute font-bold bottom-2 right-1 space-x-1 flex items-center">
-        <p className="mr-1">친구 요청</p>
-        <FaCheck className="w-7 h-7 rounded-full p-1 hover:bg-gray-200 text-lg text-green-700 flex justify-center items-center cursor-pointer" />
-        <FaXmark className="w-7 h-7 rounded-full p-1 hover:bg-gray-200 text-lg text-red-700 flex justify-center items-center cursor-pointer" />
-      </div> */}
     </div>
   );
 }
