@@ -15,6 +15,7 @@ import { CancelBtn } from "../../components/Buttons";
 import { setProfile } from "../../api/UserApi";
 import { changeUserInfo } from "../../slices/auth";
 import { getFile } from "../../components/Util";
+import { UnderLineDropDown } from "../../components/DropDown";
 // import { editUserInfo } from "../../slices/auth";
 
 export default function MyPage({ userInfo, onClose }) {
@@ -23,10 +24,13 @@ export default function MyPage({ userInfo, onClose }) {
   const [imagePre, setImagePre] = useState(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [year, setYear] = useState("");
+  const [month, setMonth] = useState("");
   const [date, setDate] = useState("");
   const [color, setColor] = useState(userInfo.profileColor || "Purple");
   const [showPalette, setShowPalette] = useState(false);
   const [onOffPalette, setOnOffPalette] = useState(false);
+
   useEffect(() => {
     if (userInfo?.name) {
       setName(userInfo?.name);
@@ -35,7 +39,9 @@ export default function MyPage({ userInfo, onClose }) {
       setEmail(userInfo?.email);
     }
     if (userInfo?.dateBirth) {
-      setDate(formatDate(userInfo?.dateBirth, "birth"));
+      setYear(userInfo?.dateBirth.slice(0, 4));
+      setMonth(userInfo?.dateBirth.slice(4, 6));
+      setDate(userInfo?.dateBirth.slice(6));
     }
     if (userInfo?.color) {
       setColor(userInfo?.color);
@@ -95,7 +101,10 @@ export default function MyPage({ userInfo, onClose }) {
 
   const handleSaveClick = async () => {
     const formData = new FormData();
-    const cleanDate = date.replace(/\s|\./g, "");
+    const cleanDate =
+      String(year) +
+      String(month).padStart(2, "0") +
+      String(date).padStart(2, "0");
 
     if (cleanDate) {
       formData.append("dateBirth", cleanDate);
@@ -224,12 +233,33 @@ export default function MyPage({ userInfo, onClose }) {
               textSize="text-lg"
               readOnly={true}
             />
-            <UnderLineDateInput
-              value={date}
-              startIcon={FaCakeCandles}
-              handleInputChange={handleDateChange}
-              textSize="text-lg"
-            />
+            <div className="flex space-x-2">
+              <UnderLineDropDown
+                id="year"
+                type="year"
+                value={year && year}
+                setData={setYear}
+                startIcon={FaCakeCandles}
+                placeholder="Year"
+                textSize="text-lg"
+              />
+              <UnderLineDropDown
+                id="month"
+                type="month"
+                value={month && month}
+                setData={setMonth}
+                placeholder="Month"
+                textSize="text-lg"
+              />
+              <UnderLineDropDown
+                id="date"
+                type="date"
+                value={date && date}
+                setData={setDate}
+                placeholder="Date"
+                textSize="text-lg"
+              />
+            </div>
           </div>
         </div>
         {/* 총 포스팅 수, 친구 수 */}
@@ -240,7 +270,7 @@ export default function MyPage({ userInfo, onClose }) {
           </div>
           <div className="flex flex-col justify-center items-center space-y-2">
             <p className="font-bold text-gray-700">Following</p>
-            <p>{userInfo?.friendsLength}</p>
+            <p>{userInfo?.friendsLength ? userInfo?.friendsLength : 0}</p>
           </div>
         </div>
       </div>
