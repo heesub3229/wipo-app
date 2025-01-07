@@ -94,57 +94,68 @@ export default function AddFriends({ isOpen, setIsOpen }) {
   };
 
   return (
-    <div
-      className={`w-[95%] bg-white absolute bottom-0 rounded-t-md flex flex-col items-center p-5 select-none transform transition-all duration-500 ease-in-out ${
-        isOpen ? "translate-y-0" : "translate-y-full"
-      } ${isExpanded ? "h-[90%]" : "h-[60%]"}`}
-    >
+    <>
       <div
-        className="w-[40%] h-1 min-h-1 max-h-1 rounded-full bg-gray-400 hover:bg-gray-500 mb-5"
-        onMouseDown={handleMouseDown}
-      />
-      <div className="w-[90%] flex space-x-5 items-end pb-4 text-black">
-        <UnderLineInput
-          placeholder="친구를 찾아보세요"
-          startIcon={FaMagnifyingGlass}
-          handleInputChange={handleSearchFriendChange}
-          keyDownEvent={handleSearchClick}
+        className={`fixed inset-0 transition-opacity duration-500 ease-in-out ${
+          isOpen ? "opacity-100 visible " : "opacity-0 invisible"
+        }`}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(false);
+        }}
+      ></div>
+      <div
+        className={`w-[95%] bg-white absolute bottom-0 rounded-t-md flex flex-col items-center p-5 select-none transform transition-all duration-500 ease-in-out ${
+          isOpen ? "translate-y-0" : "translate-y-full"
+        } ${isExpanded ? "h-[90%]" : "h-[60%]"}`}
+      >
+        <div
+          className="w-[40%] h-1 min-h-1 max-h-1 rounded-full bg-gray-400 hover:bg-gray-500 mb-5"
+          onMouseDown={handleMouseDown}
         />
-        <button
-          className="whitespace-nowrap h-[70%] border px-4 rounded-md hover:bg-gray-200"
-          onClick={() => handleSearchClick()}
-        >
-          검색
-        </button>
-      </div>
-      <div className="w-full text-black overflow-auto px-4">
-        {searchList &&
-          searchList.map((item) => (
-            <div key={item.sid}>
-              <div
-                className="h-auto flex p-2 space-x-4 hover:bg-gray-200 select-none"
-                onClick={() => handleProfileClick(item.sid)}
-              >
-                <div className="w-11 h-11 rounded-full bg-gray-100 flex justify-center items-center text-xl text-gray-500">
-                  <FaUser />
-                </div>
-                <div className="flex flex-col">
-                  <p className="font-bold">{item.name}</p>
-                  <p className="text-sm">{item.email}</p>
-                </div>
-              </div>
-              {selectedProfileSid === item.sid && (
-                <Modal
-                  isOpen={!!selectedProfileSid}
-                  onClose={handleProfileClose}
+        <div className="w-[90%] flex space-x-5 items-end pb-4 text-black">
+          <UnderLineInput
+            placeholder="친구를 찾아보세요"
+            startIcon={FaMagnifyingGlass}
+            handleInputChange={handleSearchFriendChange}
+            keyDownEvent={handleSearchClick}
+          />
+          <button
+            className="whitespace-nowrap h-[70%] border px-4 rounded-md hover:bg-gray-200"
+            onClick={() => handleSearchClick()}
+          >
+            검색
+          </button>
+        </div>
+        <div className="w-full text-black overflow-auto px-4">
+          {searchList &&
+            searchList.map((item) => (
+              <div key={item.sid}>
+                <div
+                  className="h-auto flex p-2 space-x-4 hover:bg-gray-200 select-none"
+                  onClick={() => handleProfileClick(item.sid)}
                 >
-                  <Profile info={getUserInfo(item.sid)} type={"S"} />
-                </Modal>
-              )}
-              <div className="w-full border-t my-1"></div>
-            </div>
-          ))}
+                  <div className="w-11 h-11 rounded-full bg-gray-100 flex justify-center items-center text-xl text-gray-500">
+                    <FaUser />
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="font-bold">{item.name}</p>
+                    <p className="text-sm">{item.email}</p>
+                  </div>
+                </div>
+                {selectedProfileSid === item.sid && (
+                  <Modal
+                    isOpen={!!selectedProfileSid}
+                    onClose={handleProfileClose}
+                  >
+                    <Profile info={getUserInfo(item.sid)} type={"S"} />
+                  </Modal>
+                )}
+                <div className="w-full border-t my-1"></div>
+              </div>
+            ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

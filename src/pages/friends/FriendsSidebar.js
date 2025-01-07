@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { FaUserGroup, FaUserPlus, FaMagnifyingGlass } from "react-icons/fa6";
+import { AiOutlineSync } from "react-icons/ai";
 import { UnderLineInputW } from "../../components/TextField";
 import FriendsList from "./FriendsList";
 import AddFriends from "./AddFriends";
@@ -48,6 +49,8 @@ export default function FriendsSideBar({ isOpen, setIsOpen }) {
   const handleAddFriendClick = () => {
     setAddFriendsOpen((prev) => !prev);
   };
+
+  const handleRefreshClick = () => {};
   return (
     <>
       <div
@@ -71,6 +74,12 @@ export default function FriendsSideBar({ isOpen, setIsOpen }) {
             <div className="flex items-end space-x-2">
               <p>친구 목록</p>
               <p className="text-base">( {authStateFriend.length} )</p>
+            </div>
+            <div
+              className="text-2xl p-1 hover:bg-white hover:bg-opacity-20 rounded-full cursor-pointer"
+              onClick={() => handleRefreshClick()}
+            >
+              <AiOutlineSync />
             </div>
           </div>
           <div
