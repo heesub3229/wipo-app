@@ -21,7 +21,6 @@ export default function Header() {
 
   const authState = useSelector((state) => state.auth);
   const alertState = useSelector((state) => state.alert);
-  console.log(authState);
   useEffect(() => {
     setUserInfo(authState);
   }, [authState]);
