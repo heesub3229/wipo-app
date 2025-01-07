@@ -13,14 +13,15 @@ import Kakao from "../../images/accounts/Kakao.png";
 import Google from "../../images/accounts/Google.png";
 import { generateState, nowDate } from "../../components/Util";
 import { useDispatch, useSelector } from "react-redux";
-import { cookieSave, removeCookie } from "../../slices/cookie";
 import { login } from "../../api/UserApi";
 import { clearAuth, setToken } from "../../slices/auth";
 import moment from "moment-timezone";
 import { saveUser } from "../../components/LoginIng";
 import { pushError } from "../../slices/error";
+import { Cookies } from "react-cookie";
 
 export default function Login() {
+  const cookie = new Cookies();
   const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
   const KakaoApiKey = process.env.REACT_APP_KAKAO_API;
 
@@ -29,10 +30,9 @@ export default function Login() {
   const googleRedirectUri = process.env.REACT_APP_GOOGLE_REDIRECT_URL;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const cookie = useSelector((state) => state.cookie.cookie);
   const [showPwFlag, setShowPwFlag] = useState(false);
   const [isChecked, setIsChecked] = useState(
-    cookie["wipoEmail"] ? true : false
+    cookie.get("wipoEmail") ? true : false
   );
   const [email, setEmail] = useState(cookie["wipoEmail"] || "");
   const [password, setPassword] = useState("");
@@ -43,15 +43,9 @@ export default function Login() {
     setEmail(value);
     setEmailErrFlag(false);
     if (isChecked) {
-      dispatch(
-        cookieSave({
-          key: "wipoEmail",
-          value: value,
-          options: { maxAge: 30 * 24 * 60 * 60 },
-        })
-      );
+      cookie.set("wipoEmail", value, { maxAge: 30 * 24 * 60 * 60 });
     } else {
-      dispatch(removeCookie({ key: "wipoEmail" }));
+      cookie.remove("wipoEmail", { path: "/" });
     }
   };
 
@@ -67,15 +61,9 @@ export default function Login() {
   const handleCheckboxChange = (event) => {
     const target = event.target.checked;
     if (target) {
-      dispatch(
-        cookieSave({
-          key: "wipoEmail",
-          value: email,
-          options: { maxAge: 30 * 24 * 60 * 60 },
-        })
-      );
+      cookie.set("wipoEmail", email, { maxAge: 30 * 24 * 60 * 60 });
     } else {
-      dispatch(removeCookie({ key: "wipoEmail" }));
+      cookie.remove("wipoEmail", { path: "/" });
     }
     setIsChecked((prev) => !prev);
   };
@@ -152,10 +140,13 @@ export default function Login() {
 
   const tokenSave = async (token) => {
     if (token) {
-      const tokenAction = await dispatch(
-        setToken({ jwtToken: token, loginType: "W" })
-      );
-      return tokenAction.payload;
+      const data = token.split(";");
+
+      cookie.set("jwtToken", data[0], {
+        httpOnly: false,
+        expires: new Date(Date.now() + Number(data[1]) * 1000),
+      });
+      return "Y";
     } else {
       return null;
     }

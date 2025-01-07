@@ -18,6 +18,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { clearAuth } from "../../slices/auth";
 import { useDispatch } from "react-redux";
+import { disconStream } from "../../api/UserApi";
+import { Cookies } from "react-cookie";
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const navigate = useNavigate();
@@ -33,9 +35,17 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const handleReceiptClick = () => {};
   const handlePopRest = () => {};
   const handleNavClick = () => {};
-  const handleLogoutClick = () => {
-    dispatch(clearAuth());
-    navigate("/");
+  const handleLogoutClick = async () => {
+    const cookie = new Cookies();
+    const res = await dispatch(disconStream(cookie.get("jwtToken")));
+    if (res.payload) {
+      const { status } = res.payload;
+      if (status === 200) {
+        cookie.remove("jwtToken", { path: "/" });
+        dispatch(clearAuth());
+        navigate("/");
+      }
+    }
   };
   return (
     <>

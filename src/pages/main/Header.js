@@ -9,6 +9,7 @@ import { Modal } from "../../components/Modal";
 import MyPage from "../myPage/MyPage";
 import { useSelector } from "react-redux";
 import FriendsSideBar from "../friends/FriendsSidebar";
+import { getFile } from "../../components/Util";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -16,14 +17,14 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [friendsOpen, setFriendsOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
   const [myPageOpen, setMyPageOpen] = useState(false);
 
   const authState = useSelector((state) => state.auth);
-
+  const alertState = useSelector((state) => state.alert);
+  console.log(authState);
   useEffect(() => {
     setUserInfo(authState);
-  }, []);
+  }, [authState]);
 
   const handleOpenClick = () => {
     setIsOpen((prev) => !prev);
@@ -38,14 +39,8 @@ export default function Header() {
   };
 
   const handleBellClick = () => {
-    if (alertOpen) {
-      setIsClosing(true);
-      setTimeout(() => {
-        setAlertOpen(false);
-        setIsClosing(false);
-      }, 290);
-    } else {
-      setAlertOpen(true);
+    if (alertState.length > 0) {
+      setAlertOpen((prevData) => !prevData);
     }
   };
 
@@ -81,12 +76,17 @@ export default function Header() {
           <div className="relative">
             <FaRegBell />
             <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-              <span className="inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+              {alertState.filter((item) => item.confirm_flag === "N").length >
+                0 && (
+                <>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                  <span className="inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                </>
+              )}
             </span>
-            {alertOpen && (
+            {alertState.length > 0 && alertOpen && (
               <div onClick={(e) => e.stopPropagation()}>
-                <Alert isClosing={isClosing} onClose={handleBellClick} />
+                <Alert isClosing={alertOpen} onClose={handleBellClick} />
               </div>
             )}
           </div>
@@ -97,7 +97,7 @@ export default function Header() {
         >
           <FaUserGroup />
         </div>
-        {!userInfo.userImage ? (
+        {!userInfo.file?.filepath ? (
           <div
             className="w-8 h-8 rounded-full bg-white hover:bg-gray-100 flex justify-center items-center text-gray-500 cursor-pointer"
             onClick={() => handleProfileClick()}
@@ -107,7 +107,7 @@ export default function Header() {
         ) : (
           <img
             className="w-8 h-8 rounded-full  justify-center items-center cursor-pointer"
-            src={userInfo.userImage}
+            src={getFile(userInfo.file.filepath)}
             onClick={() => handleProfileClick()}
             alt="profile"
           />

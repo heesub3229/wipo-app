@@ -3,85 +3,44 @@ import { useEffect } from "react";
 import { LoginLoading } from "./Common";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import auth, { saveUserInfo, setToken } from "../slices/auth";
+import auth, { saveUserInfo } from "../slices/auth";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { userInfo } from "../api/UserApi";
-const serverUrl = process.env.REACT_APP_SERVER_API;
+import { otherLogin, userInfo } from "../api/UserApi";
+import { Cookies } from "react-cookie";
+const cookie = new Cookies();
 export const KakaoLogin = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const code = new URL(window.location.href).searchParams.get("code");
   useEffect(() => {
     const kakaoAuth = async () => {
-      const response = await axios.get(
-        `${serverUrl}/user/kakaoLogin?code=${code}`
-      );
-
-      const res = await response.data;
-      if (res) {
-        if (res.errFlag === true) {
-          //에러처리부분
-          navigate("/");
-        } else {
-          if (res.data) {
-            dispatch(setToken({ jwtToken: res.data, loginType: "K" }));
-            const ret = await dispatch(saveUser()).unwrap();
-            const { status, data } = ret;
-            if (status === 200) {
-              navigate(data);
-            } else {
-              navigate("/");
-            }
-          }
+      try {
+        const result = await dispatch(
+          otherLogin({ type: "kakaoLogin", code: code })
+        ).unwrap();
+        if (result) {
+          const data = result.data.data.split(";");
+          cookie.set("jwtToken", data[0], {
+            httpOnly: false,
+            expires: new Date(Date.now() + Number(data[1]) * 1000),
+          });
         }
-      } else {
+      } catch (error) {
         navigate("/");
+      } finally {
+        const ret = await dispatch(saveUser()).unwrap();
+        const { status, data } = ret;
+        if (status === 200) {
+          navigate(data);
+        } else {
+          navigate("/");
+        }
       }
     };
-
     kakaoAuth();
   }, []);
 
-  return (
-    <>
-      <LoginLoading />
-    </>
-  );
-};
-
-export const NaverLogin = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const code = new URL(window.location.href).searchParams.get("code");
-  useEffect(() => {
-    const kakaoAuth = async () => {
-      const response = await axios.get(
-        `${serverUrl}/user/naverLogin?code=${code}`
-      );
-
-      const res = await response.data;
-      if (res) {
-        if (res.errFlag === true) {
-          //에러처리부분
-          navigate("/");
-        } else {
-          if (res.data) {
-            dispatch(setToken({ jwtToken: res.data, loginType: "N" }));
-          }
-        }
-      } else {
-        navigate("/");
-      }
-    };
-
-    kakaoAuth();
-  }, []);
-
-  return (
-    <>
-      <LoginLoading />
-    </>
-  );
+  return <></>;
 };
 
 export const GoogleLogin = () => {
@@ -90,69 +49,50 @@ export const GoogleLogin = () => {
   const code = new URL(window.location.href).searchParams.get("code");
   useEffect(() => {
     const googleAuth = async () => {
-      const response = await axios.get(
-        `${serverUrl}/user/googleLogin?code=${code}`
-      );
-
-      const res = await response.data;
-
-      if (response.status !== 200) {
-        navigate("/");
-      }
-
-      if (res) {
-        if (res.errFlag === true) {
-          //에러처리부분
-          navigate("/");
-        } else {
-          if (res.data) {
-            dispatch(setToken({ jwtToken: res.data, loginType: "G" }));
-            const ret = await dispatch(saveUser()).unwrap();
-            const { status, data } = ret;
-            if (status === 200) {
-              navigate(data);
-            } else {
-              navigate("/");
-            }
-          }
+      try {
+        const result = await dispatch(
+          otherLogin({ type: "googleLogin", code: code })
+        ).unwrap();
+        if (result) {
+          const data = result.data.data.split(";");
+          cookie.set("jwtToken", data[0], {
+            httpOnly: false,
+            expires: new Date(Date.now() + Number(data[1]) * 1000),
+          });
         }
-      } else {
+      } catch (error) {
         navigate("/");
+      } finally {
+        const ret = await dispatch(saveUser()).unwrap();
+        const { status, data } = ret;
+        if (status === 200) {
+          navigate(data);
+        } else {
+          navigate("/");
+        }
       }
     };
 
     googleAuth();
   }, []);
 
-  return (
-    <>
-      <LoginLoading />
-    </>
-  );
+  return <></>;
 };
 
 //로그인 후 유저정보셋팅
 export const saveUser = createAsyncThunk(
   "user/saveUser",
   async (_, { getState, dispatch, rejectWithValue }) => {
-    const state = getState();
-    const authState = state.auth;
-    if (!authState?.jwtToken) {
-      return rejectWithValue({ status: 500, message: { data: "토큰없음" } });
+    const cookie = new Cookies();
+    if (!cookie.get("jwtToken")) {
+      return { status: 500, message: { data: "토큰없음" } };
     }
 
     try {
-      const result = await dispatch(userInfo(authState.jwtToken)).unwrap();
+      const result = await dispatch(userInfo(cookie.get("jwtToken"))).unwrap();
       const { status, data } = result;
       if (status === 200 && data?.data) {
-        dispatch(
-          saveUserInfo({
-            userSid: data?.data?.sid,
-            email: data?.data?.email,
-            dateBirth: data?.data?.dateBirth,
-            name: data?.data?.name,
-          })
-        );
+        dispatch(saveUserInfo(data.data));
 
         if (data?.data?.name && data?.data?.dateBirth) {
           return { status: 200, data: "/Main" };

@@ -3,8 +3,8 @@ import MarkedPlace from "../pages/post/MarkedPlace";
 import ReactDOMServer from "react-dom/server";
 const place = new window.kakao.maps.services.Places();
 const geocoder = new window.kakao.maps.services.Geocoder();
-
-export const generateState = async () => {
+const serverUrl = process.env.REACT_APP_SERVER_API;
+export const generateState = () => {
   return (
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15)
@@ -266,4 +266,10 @@ export const setInfo = async (map, markers, placeName, loc) => {
   infoWindow.open(map, markers);
 
   return infoWindow;
+};
+
+export const getFile = (filepath) => {
+  const convFilepath = String(filepath).substring(1);
+
+  return serverUrl + convFilepath;
 };

@@ -11,11 +11,16 @@ const errorSlice = createSlice({
     pushError: (state, action) => {
       const { type, error, status, time } = action.payload;
       const id = generateState();
-      state[id] = { type: type, error: error, status: status, time: time };
+      state[id] = {
+        type: type,
+        error: error,
+        status: status,
+        time: time,
+      };
     },
     delError: (state, action) => {
-      const id = action.payload || 0;
-      if (id !== 0) {
+      const id = action.payload;
+      if (id) {
         delete state[id];
       }
     },

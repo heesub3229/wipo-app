@@ -6,14 +6,15 @@ import { Error } from "../../components/Common";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getPostMy } from "../../api/PostApi";
+import { Cookies } from "react-cookie";
 
 export default function Main() {
   const dispatch = useDispatch();
-  const authJwtState = useSelector((state) => state.auth.jwtToken);
   const navigate = useNavigate();
   useEffect(() => {
-    if (authJwtState) {
-      dispatch(getPostMy({ jwt: authJwtState, formData: 0 }));
+    const cookie = new Cookies();
+    if (cookie.get("jwtToken")) {
+      //dispatch(getPostMy({ jwt: cookieState, formData: 0 }));
     } else {
       navigate("/");
     }

@@ -4,81 +4,12 @@ import { FaUserGroup, FaUserPlus, FaMagnifyingGlass } from "react-icons/fa6";
 import { UnderLineInputW } from "../../components/TextField";
 import FriendsList from "./FriendsList";
 import AddFriends from "./AddFriends";
-
-const friendsEx = [
-  {
-    userSid: 1,
-    name: "이주영",
-    email: "juyoung05@hanmail.net",
-    dateBirth: "20000509",
-    fileSid: "11",
-  },
-  {
-    userSid: 2,
-    name: "김희섭",
-    email: "heesub3229@naver.com",
-    dateBirth: "19901204",
-    fileSid: "12",
-  },
-  {
-    userSid: 3,
-    name: "흰둥이",
-    email: "siro@google.com",
-    dateBirth: "20240505",
-    fileSid: "13",
-  },
-  {
-    userSid: 4,
-    name: "짱구",
-    email: "juyoung05@hanmail.net",
-    dateBirth: "20000509",
-    fileSid: "11",
-  },
-  {
-    userSid: 5,
-    name: "맹구",
-    email: "heesub3229@naver.com",
-    dateBirth: "19901204",
-    fileSid: "12",
-  },
-  {
-    userSid: 6,
-    name: "유리",
-    email: "siro@google.com",
-    dateBirth: "20240505",
-    fileSid: "13",
-  },
-  {
-    userSid: 7,
-    name: "철수",
-    email: "juyoung05@hanmail.net",
-    dateBirth: "20000509",
-    fileSid: "11",
-  },
-  {
-    userSid: 8,
-    name: "훈이",
-    email: "heesub3229@naver.com",
-    dateBirth: "19901204",
-    fileSid: "12",
-  },
-  {
-    userSid: 9,
-    name: "수지",
-    email: "siro@google.com",
-    dateBirth: "20240505",
-    fileSid: "13",
-  },
-];
+import { useSelector } from "react-redux";
 
 export default function FriendsSideBar({ isOpen, setIsOpen }) {
-  const [friends, setFriends] = useState([]);
   const [searchData, setSearchData] = useState("");
   const [addFriendsOpen, setAddFriendsOpen] = useState(false);
-
-  useEffect(() => {
-    setFriends(friendsEx);
-  }, []);
+  const authStateFriend = useSelector((state) => state.auth.friend);
 
   useEffect(() => {
     setAddFriendsOpen(false);
@@ -139,7 +70,7 @@ export default function FriendsSideBar({ isOpen, setIsOpen }) {
             <FaUserGroup />
             <div className="flex items-end space-x-2">
               <p>친구 목록</p>
-              <p className="text-base">( {friends.length} )</p>
+              <p className="text-base">( {authStateFriend.length} )</p>
             </div>
           </div>
           <div
@@ -155,7 +86,7 @@ export default function FriendsSideBar({ isOpen, setIsOpen }) {
           textSize="text-xl"
         />
         <div className="mt-5 w-full flex justify-center overflow-auto">
-          <FriendsList friends={friends} />
+          <FriendsList />
         </div>
         <AddFriends isOpen={addFriendsOpen} setIsOpen={setAddFriendsOpen} />
       </div>

@@ -12,6 +12,9 @@ import { useDispatch } from "react-redux";
 import { UnderLineDateInput, UnderLineInput } from "../../components/TextField";
 import { formatDate } from "../../components/Common";
 import { CancelBtn } from "../../components/Buttons";
+import { setProfile } from "../../api/UserApi";
+import { changeUserInfo } from "../../slices/auth";
+import { getFile } from "../../components/Util";
 // import { editUserInfo } from "../../slices/auth";
 
 export default function MyPage({ userInfo, onClose }) {
@@ -21,10 +24,9 @@ export default function MyPage({ userInfo, onClose }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [date, setDate] = useState("");
-  const [color, setColor] = useState("");
+  const [color, setColor] = useState(userInfo.profileColor || "Purple");
   const [showPalette, setShowPalette] = useState(false);
   const [onOffPalette, setOnOffPalette] = useState(false);
-
   useEffect(() => {
     if (userInfo?.name) {
       setName(userInfo?.name);
@@ -41,8 +43,11 @@ export default function MyPage({ userInfo, onClose }) {
   }, [userInfo]);
 
   useEffect(() => {
-    setImagePre(userInfo.userImage);
-  }, [userInfo]);
+    if (userInfo.file.filepath) {
+      const convTemp = getFile(userInfo.file.filepath);
+      setImagePre(convTemp);
+    }
+  }, [userInfo.file]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -89,40 +94,25 @@ export default function MyPage({ userInfo, onClose }) {
   };
 
   const handleSaveClick = async () => {
-    try {
-      const cleanDate = date.replace(/\s|\./g, "");
+    const formData = new FormData();
+    const cleanDate = date.replace(/\s|\./g, "");
 
-      let fileSid = null;
-
-      // if (image) {
-      //   const formData = new FormData();
-      //   formData.append("file", image);
-
-      //   const uploadResponse = await fetch("/api/upload", {
-      //     method: "POST",
-      //     body: formData,
-      //     headers: {
-      //       Authorization: `Bearer ${authState.jwtToken}`, // JWT 토큰
-      //     },
-      //   });
-
-      //   if (!uploadResponse.ok) {
-      //     throw new Error("이미지 업로드 실패");
-      //   }
-
-      //   const uploadData = await uploadResponse.json();
-      //   fileSid = uploadData.fileSid;
-      // }
-
-      const updatedUserInfo = {
-        dateBirth: cleanDate,
-        color: color,
-        ...(fileSid && { fileSid }),
-      };
-
-      // dispatch(editUserInfo(updatedUserInfo));
-    } catch (error) {
-      console.error(error);
+    if (cleanDate) {
+      formData.append("dateBirth", cleanDate);
+    }
+    if (color) {
+      formData.append("color", color);
+    }
+    if (image) {
+      formData.append("image", image);
+    }
+    const res = await dispatch(setProfile(formData));
+    if (res) {
+      const { data, status } = res.payload;
+      if (status === 200) {
+        dispatch(changeUserInfo(data.data));
+        onClose();
+      }
     }
   };
 
@@ -250,7 +240,7 @@ export default function MyPage({ userInfo, onClose }) {
           </div>
           <div className="flex flex-col justify-center items-center space-y-2">
             <p className="font-bold text-gray-700">Following</p>
-            <p>102</p>
+            <p>{userInfo?.friendsLength}</p>
           </div>
         </div>
       </div>

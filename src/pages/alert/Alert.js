@@ -3,77 +3,39 @@ import { formatDate } from "../../components/Common";
 import { Modal } from "../../components/Modal";
 import Notice from "./Notice";
 import Profile from "../myPage/Profile";
-
-const alertEx = [
-  {
-    sid: 1,
-    title: "공지",
-    content: "2024. 12. 9 업데이트 내용에 대해 공지드립니다.",
-    date: "20241209",
-    type: "A",
-    confirmFlag: "N",
-  },
-  {
-    sid: 2,
-    title: "공지",
-    content: "2024. 12. 9 업데이트 내용에 대해 공지드립니다.",
-    date: "20241209",
-    type: "A",
-    confirmFlag: "N",
-  },
-  {
-    sid: 3,
-    title: "공지",
-    content: "2024. 12. 9 업데이트 내용에 대해 공지드립니다.",
-    date: "20241209",
-    type: "A",
-    confirmFlag: "N",
-  },
-  {
-    sid: 4,
-    title: "친구 요청",
-    content: "이주영님에게 온 친구 요청이 있습니다.",
-    date: "20241209",
-    type: "F",
-    confirmFlag: "N",
-  },
-  {
-    sid: 5,
-    title: "게시물 태그",
-    content: "이주영님이 게시물에 회원님을 태그했습니다.",
-    date: "20241209",
-    type: "P",
-    confirmFlag: "N",
-  },
-  {
-    sid: 6,
-    title: "친구 요청",
-    content: "이주영님에게 보낸 친구 요청이 수락되었습니다.",
-    date: "20241209",
-    type: "FA",
-    confirmFlag: "N",
-  },
-];
+import { useDispatch, useSelector } from "react-redux";
+import { getUserRelInfo } from "../../api/UserApi";
+import { Cookies } from "react-cookie";
+import Posting from "../posting/Posting";
+import { changeAlert } from "../../slices/alert";
 
 export default function Alert({ isClosing, onClose }) {
-  const [alertList, setAlertList] = useState([]);
-  const [selectedAlertSid, setSelectedAlertSid] = useState(null);
-  const [openNotice, setOpenNotice] = useState(false);
-  const [openFriendReq, setOpenFriendReq] = useState(false);
+  const [openModal, setOpenModal] = useState({
+    type: null,
+    profileFlag: "",
+    data: null,
+    alertSid: null,
+    alertType: null,
+  });
+  const [flag, setFlag] = useState(false);
   const alertRef = useRef();
+  const alertState = useSelector((state) => state.alert || []);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    setAlertList(alertEx);
-  }, []);
+    if (isClosing) {
+      setFlag(false);
+    } else {
+      setFlag(true);
+    }
+  }, [isClosing]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        alertRef.current &&
-        !alertRef.current.contains(event.target) &&
-        selectedAlertSid === null
-      ) {
-        onClose();
+      if (!openModal.data) {
+        if (alertRef.current && !alertRef.current.contains(event.target)) {
+          onClose();
+        }
       }
     };
 
@@ -82,77 +44,97 @@ export default function Alert({ isClosing, onClose }) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [selectedAlertSid]);
+  }, [openModal]);
 
-  const handleAlertClick = (sid, type) => {
-    setAlertList((prev) =>
-      prev.map((alert) =>
-        alert.sid === sid ? { ...alert, confirmFlag: "Y" } : alert
-      )
-    );
-
-    setSelectedAlertSid(sid);
-
-    if (type === "A") {
-      setOpenNotice(true);
-    } else if (type === "F") {
-      setOpenFriendReq(true);
+  const handleAlertClick = async (sid, type, approveFlag) => {
+    const res = await dispatch(getUserRelInfo({ sid: sid }));
+    const { data, status } = res.payload;
+    if (status === 200) {
+      if (approveFlag === "W") {
+        setOpenModal({
+          type: type,
+          profileFlag: "R",
+          data: data.data,
+          alertSid: sid,
+          alertType: type,
+        });
+      } else {
+        setOpenModal({
+          type: type,
+          profileFlag: "",
+          data: data.data,
+          alertSid: sid,
+          alertType: type,
+        });
+      }
+      dispatch(changeAlert({ sid: sid, type: type, confirm_flag: "Y" }));
     }
   };
 
-  const handleCloseNotice = () => {
-    setSelectedAlertSid(null);
-    setOpenNotice(false);
-  };
-
   const handleCloseProfile = () => {
-    setSelectedAlertSid(null);
-    setOpenFriendReq(false);
+    setOpenModal({
+      type: null,
+      data: null,
+      alertSid: null,
+      alertType: null,
+      profileFlag: null,
+    });
   };
 
   return (
-    <div
-      className={`absolute top-full right-0 transform translate-x-[10px] mt-4 ${
-        isClosing ? "animate-zoomOut" : "animate-zoomIn"
-      }`}
-      ref={alertRef}
-    >
-      <div className="relative inline-block bg-indigo-50 text-black rounded-md py-3 pl-5 pr-2 min-w-[25vw] break-words shadow-lg">
-        <div className="absolute top-0 right-0 transform -translate-x-1/2 -translate-y-full w-0 h-0 border-[10px] border-transparent border-b-indigo-50 border-t-0"></div>
-        <div className="max-h-[60vh] overflow-auto pr-3">
-          {alertList.map((item) => (
-            <div
-              className="relative"
-              key={item.sid}
-              onClick={() => {
-                handleAlertClick(item.sid, item.type);
-              }}
-            >
-              <div className="w-full h-auto flex flex-col justify-center px-2 py-4  hover:bg-indigo-100 select-none">
-                <div className="flex">
-                  <p className="text-base">{item.title}</p>
-                  {item.confirmFlag === "N" && (
-                    <div className="w-2 h-2 rounded-full bg-red-500 ml-1 mt-[2px]" />
-                  )}
+    <>
+      <div
+        className={`absolute top-full right-0 transform translate-x-[10px] mt-4 ${
+          flag ? "animate-zoomOut" : "animate-zoomIn"
+        }`}
+        ref={alertRef}
+      >
+        <div className="relative inline-block bg-indigo-50 text-black rounded-md py-3 pl-5 pr-2 min-w-[25vw] break-words shadow-lg">
+          <div className="absolute top-0 right-0 transform -translate-x-1/2 -translate-y-full w-0 h-0 border-[10px] border-transparent border-b-indigo-50 border-t-0"></div>
+          <div className="max-h-[60vh] overflow-auto pr-3">
+            {alertState.map((item) => (
+              <div
+                className="relative"
+                key={item.sid}
+                onClick={() => {
+                  handleAlertClick(item.sid, item.type, item.approve_flag);
+                }}
+              >
+                <div className="w-full h-auto flex flex-col justify-center px-2 py-4  hover:bg-indigo-100 select-none">
+                  <div className="flex">
+                    <p className="text-base">{item.title}</p>
+                    {item.confirm_flag === "N" && (
+                      <div className="w-2 h-2 rounded-full bg-red-500 ml-1 mt-[2px]" />
+                    )}
+                  </div>
+                  <p className="text-sm">{item.content}</p>
+                  <p className="text-xs absolute right-1 bottom-1">
+                    {item.date}
+                  </p>
                 </div>
-                <p className="text-sm">{item.content}</p>
-                <p className="text-xs absolute right-1 bottom-1">
-                  {formatDate(item.date, "dot")}
-                </p>
+                <div className="w-full border-t"></div>
               </div>
-              <div className="w-full border-t"></div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-
-      <Modal isOpen={openNotice} onClose={handleCloseNotice}>
-        <Notice />
+      <Modal
+        isOpen={openModal.type === "P" ? true : false}
+        onClose={() => handleCloseProfile()}
+      >
+        <Posting />
       </Modal>
-
-      <Modal isOpen={openFriendReq} onClose={handleCloseProfile}>
-        <Profile />
+      <Modal
+        isOpen={openModal.type === "F" ? true : false}
+        onClose={() => handleCloseProfile()}
+      >
+        <Profile
+          type={openModal.profileFlag}
+          info={openModal.data}
+          alertSid={openModal.alertSid}
+          alertType={openModal.alertType}
+        />
       </Modal>
-    </div>
+    </>
   );
 }

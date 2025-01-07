@@ -8,65 +8,9 @@ import {
 } from "react-icons/fa6";
 import { Modal } from "../../components/Modal";
 import Profile from "../myPage/Profile";
-
-const friendsListEx = [
-  {
-    userSid: 1,
-    name: "이주영",
-    email: "juyoung05@hanmail.net",
-    dateBirth: "20000509",
-    fileSid: "11",
-  },
-  {
-    userSid: 2,
-    name: "이주영",
-    email: "juyoung05@hanmail.net",
-    dateBirth: "20000509",
-    fileSid: "11",
-  },
-  {
-    userSid: 3,
-    name: "이주영",
-    email: "juyoung05@hanmail.net",
-    dateBirth: "20000509",
-    fileSid: "11",
-  },
-  {
-    userSid: 4,
-    name: "이주영",
-    email: "juyoung05@hanmail.net",
-    dateBirth: "20000509",
-    fileSid: "11",
-  },
-  {
-    userSid: 5,
-    name: "이주영",
-    email: "juyoung05@hanmail.net",
-    dateBirth: "20000509",
-    fileSid: "11",
-  },
-  {
-    userSid: 6,
-    name: "이주영",
-    email: "juyoung05@hanmail.net",
-    dateBirth: "20000509",
-    fileSid: "11",
-  },
-  {
-    userSid: 7,
-    name: "이주영",
-    email: "juyoung05@hanmail.net",
-    dateBirth: "20000509",
-    fileSid: "11",
-  },
-  {
-    userSid: 8,
-    name: "이주영",
-    email: "juyoung05@hanmail.net",
-    dateBirth: "20000509",
-    fileSid: "11",
-  },
-];
+import { useDispatch } from "react-redux";
+import { getFindByUser } from "../../api/UserApi";
+import { Cookies } from "react-cookie";
 
 export default function AddFriends({ isOpen, setIsOpen }) {
   const [searchFriend, setSearchFriend] = useState("");
@@ -74,10 +18,8 @@ export default function AddFriends({ isOpen, setIsOpen }) {
   const [selectedProfileSid, setSelectedProfileSid] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-
-  useEffect(() => {
-    setSearchList(friendsListEx);
-  }, []);
+  const dispatch = useDispatch();
+  const cookie = new Cookies();
 
   const handleMouseDown = () => {
     setDragging(true);
@@ -121,7 +63,7 @@ export default function AddFriends({ isOpen, setIsOpen }) {
   }, [dragging]);
 
   const getUserInfo = (userSid) => {
-    return searchList.find((user) => user.userSid === userSid);
+    return searchList.find((user) => user.sid === userSid);
   };
 
   const handleProfileClick = (userSid) => {
@@ -136,8 +78,19 @@ export default function AddFriends({ isOpen, setIsOpen }) {
     setSearchFriend(value);
   };
 
-  const handleSearchClick = () => {
+  const handleSearchClick = async () => {
     //searchFriend으로 친구 검색
+    if (searchFriend) {
+      const res = await dispatch(
+        getFindByUser({ jwtToken: cookie.get("jwtToken"), str: searchFriend })
+      );
+
+      const { status, data } = res.payload;
+
+      if (status === 200) {
+        setSearchList(data?.data);
+      }
+    }
   };
 
   return (
@@ -167,10 +120,10 @@ export default function AddFriends({ isOpen, setIsOpen }) {
       <div className="w-full text-black overflow-auto px-4">
         {searchList &&
           searchList.map((item) => (
-            <div key={item.userSid}>
+            <div key={item.sid}>
               <div
                 className="h-auto flex p-2 space-x-4 hover:bg-gray-200 select-none"
-                onClick={() => handleProfileClick(item.userSid)}
+                onClick={() => handleProfileClick(item.sid)}
               >
                 <div className="w-11 h-11 rounded-full bg-gray-100 flex justify-center items-center text-xl text-gray-500">
                   <FaUser />
@@ -180,12 +133,12 @@ export default function AddFriends({ isOpen, setIsOpen }) {
                   <p className="text-sm">{item.email}</p>
                 </div>
               </div>
-              {selectedProfileSid === item.userSid && (
+              {selectedProfileSid === item.sid && (
                 <Modal
                   isOpen={!!selectedProfileSid}
                   onClose={handleProfileClose}
                 >
-                  <Profile info={getUserInfo(item.userSid)} />
+                  <Profile info={getUserInfo(item.sid)} type={"S"} />
                 </Modal>
               )}
               <div className="w-full border-t my-1"></div>
