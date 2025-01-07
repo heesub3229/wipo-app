@@ -18,9 +18,15 @@ export default function Alert({ isClosing, onClose }) {
     alertType: null,
   });
   const [flag, setFlag] = useState(false);
+  const [currentTab, setCurrentTab] = useState(0);
+  const [filteredList, setFilteredList] = useState([]);
   const alertRef = useRef();
   const alertState = useSelector((state) => state.alert || []);
   const dispatch = useDispatch();
+
+  console.log(alertState);
+
+  const tabArr = [{ name: "읽지않음" }, { name: "읽음" }];
 
   useEffect(() => {
     if (isClosing) {
@@ -29,6 +35,14 @@ export default function Alert({ isClosing, onClose }) {
       setFlag(true);
     }
   }, [isClosing]);
+
+  useEffect(() => {
+    if (currentTab === 0) {
+      setFilteredList(alertState.filter((item) => item.confirm_flag === "N"));
+    } else if (currentTab === 1) {
+      setFilteredList(alertState.filter((item) => item.confirm_flag === "Y"));
+    }
+  }, [alertState, currentTab]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -81,6 +95,10 @@ export default function Alert({ isClosing, onClose }) {
     });
   };
 
+  const handleTabClick = (idx) => {
+    setCurrentTab(idx);
+  };
+
   return (
     <>
       <div
@@ -92,7 +110,21 @@ export default function Alert({ isClosing, onClose }) {
         <div className="relative inline-block bg-indigo-50 text-black rounded-md py-3 pl-5 pr-2 min-w-[25vw] break-words shadow-lg">
           <div className="absolute top-0 right-0 transform -translate-x-1/2 -translate-y-full w-0 h-0 border-[10px] border-transparent border-b-indigo-50 border-t-0"></div>
           <div className="max-h-[60vh] overflow-auto pr-3">
-            {alertState.map((item) => (
+            <div className="flex items-center space-x-3 px-2 pt-2 border-b-2 border-indigo-300">
+              {tabArr.map((item, idx) => (
+                <div
+                  className={`font-bold ${
+                    currentTab === idx
+                      ? "text-indigo-700 text-lg bg-indigo-100 bg-opacity-70 p-2 rounded-t-md"
+                      : "text-indigo-500 text-base"
+                  } `}
+                  onClick={() => handleTabClick(idx)}
+                >
+                  {item.name}
+                </div>
+              ))}
+            </div>
+            {filteredList.map((item) => (
               <div
                 className="relative"
                 key={item.sid}

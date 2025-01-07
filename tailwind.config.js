@@ -72,10 +72,18 @@ module.exports = {
           "75%": { transform: "scale(0.8)", opacity: "0.5" },
           "100%": { transform: "scale(0.6)", opacity: "0" },
         },
+        bounceTwice: {
+          "0%": { transform: "translateY(0)" },
+          "25%": { transform: "translateY(-15px)" }, // 위로 올라감
+          "50%": { transform: "translateY(0)" }, // 내려옴
+          "75%": { transform: "translateY(-10px)" }, // 살짝 덜 올라감
+          "100%": { transform: "translateY(0)" }, // 원래 위치로 돌아옴
+        },
       },
       animation: {
         zoomIn: "zoomIn 0.3s ease-out",
         zoomOut: "zoomOut 0.3s ease-in",
+        bounceTwice: "bounceTwice 0.8s ease-out",
       },
     },
   },
