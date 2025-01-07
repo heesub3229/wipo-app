@@ -270,7 +270,7 @@ export default function MyPage({ userInfo, onClose }) {
           </div>
           <div className="flex flex-col justify-center items-center space-y-2">
             <p className="font-bold text-gray-700">Following</p>
-            <p>{userInfo?.friendsLength ? userInfo?.friendsLength : 0}</p>
+            <p>{userInfo?.friendsLength}</p>
           </div>
         </div>
       </div>
