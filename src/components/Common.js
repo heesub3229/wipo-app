@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaCircleExclamation } from "react-icons/fa6";
+import { FaCircleExclamation, FaCheck } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { clearState } from "../slices/api";
 import { delError } from "../slices/error";
@@ -35,6 +35,22 @@ export const Loading = () => {
     isLoading && (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 pointer-events-auto">
         <div className="w-12 h-12 border-4 border-t-indigo-500 border-gray-300 rounded-full animate-spin"></div>
+      </div>
+    )
+  );
+};
+
+export const Success = () => {
+  const isSuccess = useSelector((state) =>
+    // 수정해야함
+    Object.values(state.api).some((api) => api?.loading)
+  );
+  return (
+    isSuccess && (
+      <div className="fixed inset-0 flex justify-center items-center z-50 pointer-events-auto">
+        <div className="w-20 h-20 border-[5px] border-indigo-500 rounded-full flex items-center justify-center animate-bounceTwice">
+          <FaCheck className="text-indigo-500 text-5xl" />
+        </div>
       </div>
     )
   );
@@ -91,7 +107,7 @@ export const Error = () => {
   if (errors.length === 0) return null;
   return (
     <div
-      className={`fixed bottom-2 right-2 flex flex-col space-y-2 min-w-1/8 max-w-1/4 min-h-1/15 max-h-60vh overflow-y-auto ${
+      className={`fixed z-[100] bottom-2 right-2 flex flex-col space-y-2 min-w-1/8 max-w-1/4 min-h-1/15 max-h-60vh overflow-y-auto ${
         errors.length > 5 ? "overflow-y-auto" : "overflow-y-hidden"
       }`}
     >
