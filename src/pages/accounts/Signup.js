@@ -32,6 +32,7 @@ import { VerifyTimer } from "../../components/Timer";
 import { useDispatch, useSelector } from "react-redux";
 import { emailAuth, emailValid, asign } from "../../api/UserApi";
 import { clearState } from "../../slices/api";
+import { async } from "q";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -117,9 +118,14 @@ export default function Signup() {
     }
   };
 
-  const handleSendMail = () => {
-    dispatch(emailAuth(email));
-    setVerCnt((prev) => prev + 1);
+  const handleSendMail = async () => {
+    const res = await dispatch(emailAuth(email));
+    if (res) {
+      const { status } = res.payload;
+      if (status === 200) {
+        setVerCnt((prev) => prev + 1);
+      }
+    }
   };
 
   const handleClickVerify = async () => {

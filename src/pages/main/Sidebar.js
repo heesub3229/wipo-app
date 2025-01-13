@@ -20,6 +20,7 @@ import { clearAuth } from "../../slices/auth";
 import { useDispatch } from "react-redux";
 import { disconStream } from "../../api/UserApi";
 import { Cookies } from "react-cookie";
+import { clearPost } from "../../slices/post";
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       if (status === 200) {
         cookie.remove("jwtToken", { path: "/" });
         dispatch(clearAuth());
+        dispatch(clearPost());
         navigate("/");
       }
     }

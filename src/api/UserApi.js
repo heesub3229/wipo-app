@@ -7,6 +7,7 @@ import { clearAlert, saveAlert } from "../slices/alert";
 import { generateState } from "../components/Util";
 import { Cookies } from "react-cookie";
 import { pushFriend } from "../slices/auth";
+import { clearPost } from "../slices/post";
 
 const serverUrl = process.env.REACT_APP_SERVER_API;
 
@@ -302,8 +303,21 @@ export const PutStream = () => {
   const dispatch = useDispatch();
   const cookie = new Cookies();
   useEffect(() => {
+    const handleRefreshAction = () => {
+      navigate("/");
+    };
+
+    // 새로고침 시 동작
+    window.addEventListener("load", handleRefreshAction);
+
+    // 컴포넌트 언마운트 시 이벤트 정리
+    return () => {
+      window.removeEventListener("load", handleRefreshAction);
+    };
+  }, []);
+
+  useEffect(() => {
     if (cookie.get("jwtToken")) {
-      dispatch(clearAlert());
       const eventSource = new EventSource(
         `${serverUrl}/user/stream?jwtToken=${cookie.get("jwtToken")}`
       );
@@ -320,17 +334,17 @@ export const PutStream = () => {
 
       eventSource.onerror = () => {
         eventSource.close();
-        cookie.remove("jwtToken", { path: "/" });
         navigate("/");
       };
       return () => {
         if (cookie.get("jwtToken")) {
           dispatch(disconStream(cookie.get("jwtToken")));
-          eventSource.close();
+          dispatch(clearAlert());
+          dispatch(clearPost());
         }
       };
     }
-  }, [cookie.get("jwtToken")]);
+  }, []);
 };
 
 export const disconStream = createAsyncThunk(

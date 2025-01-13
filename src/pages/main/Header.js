@@ -38,9 +38,7 @@ export default function Header() {
   };
 
   const handleBellClick = () => {
-    if (alertState.length > 0) {
-      setAlertOpen((prevData) => !prevData);
-    }
+    setAlertOpen((prevData) => !prevData);
   };
 
   const handleProfileClick = () => {
@@ -83,7 +81,7 @@ export default function Header() {
                 </>
               )}
             </span>
-            {alertState.length > 0 && alertOpen && (
+            {alertOpen && (
               <div onClick={(e) => e.stopPropagation()}>
                 <Alert isClosing={alertOpen} onClose={handleBellClick} />
               </div>

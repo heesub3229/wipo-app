@@ -16,33 +16,23 @@ import SelectLocation from "./SelectLocation";
 import { UserSelect } from "../../components/DropDown";
 import { useDispatch, useSelector } from "react-redux";
 import { postSave } from "../../api/PostApi";
-
-const userEx = [
-  { id: 1, userName: "신짱구" },
-  { id: 2, userName: "이맹구" },
-  { id: 3, userName: "김철수" },
-  { id: 4, userName: "신유리" },
-];
+import { pushPost } from "../../slices/post";
+import { setFavMap } from "../../api/MapApi";
+import { sucFavList } from "../../slices/auth";
 
 export default function WritePost() {
   const [place, setPlace] = useState({});
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [date, setDate] = useState("");
   const [user, setUser] = useState("");
-  const [userList, setUserList] = useState([]);
   const [taggedUsers, setTaggedUsers] = useState([]);
   const [content, setContent] = useState("");
   const [imageArr, setImageArr] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const navigator = useNavigate();
   const dispatch = useDispatch();
-  const authJwtState = useSelector((state) => state.auth.jwtToken);
-
-  useEffect(() => {
-    // 친구 목록 불러오기
-    setUserList(userEx);
-  }, []);
-
+  const authStateFriend = useSelector((state) => state.auth.friend || []);
+  const authStateFavList = useSelector((state) => state.auth.favList);
   const handleOpenDatePicker = () => {
     if (!openDatePicker) {
       setOpenDatePicker(true);
@@ -53,20 +43,25 @@ export default function WritePost() {
     setUser(value);
   };
 
-  const handleAddUsers = (userName) => {
+  const handleAddUsers = (array) => {
     setTaggedUsers((prev) => {
       if (Array.isArray(prev)) {
-        return prev.includes(userName) ? prev : [...prev, userName];
+        const tempData = prev.find((item) => item.sid === array.sid);
+        if (tempData) {
+          return [tempData];
+        } else {
+          return [...prev, array];
+        }
       } else {
-        return [userName];
+        return [array];
       }
     });
   };
 
-  const handleRemoveTag = (userName) => {
+  const handleRemoveTag = (sid) => {
     setTaggedUsers((prev) => {
       if (Array.isArray(prev)) {
-        return prev.filter((tag) => tag !== userName);
+        return prev.filter((tag) => tag.sid !== sid);
       } else {
         return [];
       }
@@ -77,8 +72,37 @@ export default function WritePost() {
     setOpenModal(true);
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
+  const handleCloseModal = async () => {
+    if (authStateFavList.data) {
+      const filterData = authStateFavList.data.filter(
+        (item) =>
+          item.sid === null || (item.sid !== null && item.favFlag === "N")
+      );
+      if (filterData && filterData.length > 0) {
+        console.log("작동");
+        const filterformData = authStateFavList.data.filter(
+          (item) => !(item.sid === null && item.favFlag === "N")
+        );
+        const formData = filterformData.map((item) => ({
+          map: item,
+          favFlag: item.favFlag,
+        }));
+        const res = await dispatch(setFavMap(formData));
+        if (res) {
+          const { status, data } = res.payload;
+          if (status === 200) {
+            dispatch(sucFavList(data.data));
+            setOpenModal(false);
+          } else {
+            setOpenModal(false);
+          }
+        }
+      } else {
+        setOpenModal(false);
+      }
+    } else {
+      setOpenModal(false);
+    }
   };
 
   const handleContentChange = (value) => {
@@ -92,17 +116,20 @@ export default function WritePost() {
       date: date,
       content: content,
       map: place,
-      userSidArray: [],
+      userSidArray: taggedUsers.map((item) => item.sid),
     };
     formData.append(
       "data",
       new Blob([JSON.stringify(param)], { type: "application/json" })
     );
     imageArr.forEach((item) => formData.append("files", item));
-    const retData = await dispatch(
-      postSave({ jwt: authJwtState, formData: formData })
-    );
-    console.log(retData);
+    const res = await dispatch(postSave(formData));
+    if (res.payload) {
+      const { data, status } = res.payload;
+      if (status === 200) {
+        navigator("/Main");
+      }
+    }
   };
 
   const handleCancelClick = () => {
@@ -167,8 +194,8 @@ export default function WritePost() {
                 startIcon={FaTags}
                 handleInputChange={handleUserChange}
                 placeholder="친구를 태그해보세요"
-                list={userList.filter(
-                  (item) => item.userName.includes(user) // 입력값으로 필터링
+                list={authStateFriend.filter(
+                  (item) => item.name.includes(user) // 입력값으로 필터링
                 )}
                 setData={handleAddUsers}
                 taggedUsers={taggedUsers || []}

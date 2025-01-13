@@ -362,12 +362,12 @@ export const UserSelect = ({
                 key={index}
                 className="flex items-center px-3 py-1 bg-gray-200 rounded-full text-sm mr-1 mb-1"
               >
-                <span>{tag}</span>
+                <span>{tag.name}</span>
                 <button
                   className="ml-2 text-gray-500 hover:text-gray-800"
                   onClick={(e) => {
                     e.stopPropagation();
-                    removeTag(tag);
+                    removeTag(tag.sid);
                   }}
                 >
                   <FaXmark />
@@ -389,12 +389,12 @@ export const UserSelect = ({
                 key={index}
                 className="flex items-center px-3 py-1 bg-gray-200 rounded-full text-sm mr-1"
               >
-                <span>{tag}</span>
+                <span>{tag.name}</span>
                 <button
                   className="ml-2 bg-gray-400 hover:bg-gray-500 opacity-50 text-white rounded-full w-4 h-4 flex justify-center items-center text-sm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    removeTag(tag);
+                    removeTag(tag.sid);
                   }}
                 >
                   <FaXmark />
@@ -423,12 +423,12 @@ export const UserSelect = ({
               key={`place-${index}`}
               className="p-2 cursor-pointer hover:bg-gray-100"
               onClick={() => {
-                setData(item.userName);
+                setData(item);
                 handleInputChange("");
                 setIsOpen(false);
               }}
             >
-              <p>{item.userName}</p>
+              <p>{item.name}</p>
             </div>
           ))}
         </div>

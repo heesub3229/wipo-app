@@ -5,7 +5,7 @@ import { AccountTitle, AccountText } from "../../components/Typography";
 import { LoginInput } from "../../components/TextField";
 import { AccountButton } from "../../components/Buttons";
 import { CheckboxS } from "../../components/Checkbox";
-import { Divider } from "../../components/Common";
+import { Divider, Loading } from "../../components/Common";
 import { FiUser, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import LoginBack from "../../images/accounts/LoginBack.png";
 import Logo from "../../images/accounts/Logo.png";
@@ -19,6 +19,7 @@ import moment from "moment-timezone";
 import { saveUser } from "../../components/LoginIng";
 import { pushError } from "../../slices/error";
 import { Cookies } from "react-cookie";
+import { async } from "q";
 
 export default function Login() {
   const cookie = new Cookies();
@@ -38,6 +39,29 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [emailErrFlag, setEmailErrFlag] = useState(false);
   const [pwErrFlag, setPwErrFlag] = useState(false);
+
+  useEffect(() => {
+    const tokenLogin = async () => {
+      const res = await dispatch(saveUser());
+      if (res) {
+        const { status, data } = res.payload;
+        if (status === 200) {
+          navigate(data);
+        } else {
+          cookie.remove("jwtToken", { path: "/" });
+          navigate("/");
+        }
+      } else {
+        cookie.remove("jwtToken", { path: "/" });
+      }
+    };
+
+    if (cookie.get("jwtToken")) {
+      tokenLogin();
+    } else {
+      navigate("/");
+    }
+  }, []);
 
   const handleEmailChange = (value) => {
     setEmail(value);
@@ -60,8 +84,11 @@ export default function Login() {
 
   const handleCheckboxChange = (event) => {
     const target = event.target.checked;
+    const date = new Date();
     if (target) {
-      cookie.set("wipoEmail", email, { maxAge: 30 * 24 * 60 * 60 });
+      cookie.set("wipoEmail", email, {
+        expires: date.setFullYear(date.getFullYear() + 10),
+      });
     } else {
       cookie.remove("wipoEmail", { path: "/" });
     }
@@ -156,7 +183,7 @@ export default function Login() {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(value);
   };
-
+  if (cookie.get("jwtToken")) return <Loading />;
   return (
     <div
       className="min-h-screen w-screen bg-white bg-center bg-contain bg-no-repeat flex justify-center items-center"

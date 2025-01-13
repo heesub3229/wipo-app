@@ -8,6 +8,7 @@ import { getUserRelInfo } from "../../api/UserApi";
 import { Cookies } from "react-cookie";
 import Posting from "../posting/Posting";
 import { changeAlert } from "../../slices/alert";
+import { getPostInfo } from "../../api/PostApi";
 
 export default function Alert({ isClosing, onClose }) {
   const [openModal, setOpenModal] = useState({
@@ -23,8 +24,6 @@ export default function Alert({ isClosing, onClose }) {
   const alertRef = useRef();
   const alertState = useSelector((state) => state.alert || []);
   const dispatch = useDispatch();
-
-  console.log(alertState);
 
   const tabArr = [{ name: "읽지않음" }, { name: "읽음" }];
 
@@ -61,27 +60,44 @@ export default function Alert({ isClosing, onClose }) {
   }, [openModal]);
 
   const handleAlertClick = async (sid, type, approveFlag) => {
-    const res = await dispatch(getUserRelInfo({ sid: sid }));
-    const { data, status } = res.payload;
-    if (status === 200) {
-      if (approveFlag === "W") {
-        setOpenModal({
-          type: type,
-          profileFlag: "R",
-          data: data.data,
-          alertSid: sid,
-          alertType: type,
-        });
-      } else {
-        setOpenModal({
-          type: type,
-          profileFlag: "",
-          data: data.data,
-          alertSid: sid,
-          alertType: type,
-        });
+    if (type === "F") {
+      const res = await dispatch(getUserRelInfo({ sid: sid }));
+      const { data, status } = res.payload;
+      if (status === 200) {
+        if (approveFlag === "W") {
+          setOpenModal({
+            type: type,
+            profileFlag: "R",
+            data: data.data,
+            alertSid: sid,
+            alertType: type,
+          });
+        } else {
+          setOpenModal({
+            type: type,
+            profileFlag: "",
+            data: data.data,
+            alertSid: sid,
+            alertType: type,
+          });
+        }
+        dispatch(changeAlert({ sid: sid, type: type, confirm_flag: "Y" }));
       }
-      dispatch(changeAlert({ sid: sid, type: type, confirm_flag: "Y" }));
+    } else {
+      const res = await dispatch(getPostInfo(sid));
+      if (res) {
+        const { data, status } = res.payload;
+        if (status === 200) {
+          setOpenModal({
+            type: type,
+            profileFlag: "",
+            data: data.data,
+            alertSid: null,
+            alertType: null,
+          });
+          dispatch(changeAlert({ sid: sid, type: type, confirm_flag: "Y" }));
+        }
+      }
     }
   };
 
@@ -154,7 +170,7 @@ export default function Alert({ isClosing, onClose }) {
         isOpen={openModal.type === "P" ? true : false}
         onClose={() => handleCloseProfile()}
       >
-        <Posting />
+        <Posting data={openModal.data} />
       </Modal>
       <Modal
         isOpen={openModal.type === "F" ? true : false}

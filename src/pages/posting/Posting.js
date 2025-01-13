@@ -5,7 +5,8 @@ import ImageSlider from "../main/ImageSlider";
 import { FaUser } from "react-icons/fa6";
 import { formatDate } from "../../components/Common";
 
-export default function Posting({ post, images, onClose }) {
+export default function Posting({ data, onClose }) {
+  if (!data) return <></>;
   return (
     <>
       <div className="relative bg-white h-[90vh] w-[60%] rounded-lg p-10 overflow-hidden">
@@ -23,8 +24,10 @@ export default function Posting({ post, images, onClose }) {
               <FaUser />
             </div>
             <div>
-              <p className="text-xl font-bold">이주영</p>
-              <p>{post.location}</p>
+              <p className="text-xl font-bold">
+                {data.post?.create_user_sid?.name || ""}
+              </p>
+              <p>{data.map?.placeName || ""}</p>
             </div>
           </div>
         </div>
@@ -32,16 +35,16 @@ export default function Posting({ post, images, onClose }) {
         <div className="flex h-[60vh] space-x-10 mt-[5vh]">
           <div className="w-[55%] max-h-[60vh] overflow-auto">
             <div className="relative font-nanum whitespace-pre-wrap break-all">
-              <p className="inline">{post.content}</p>
+              <p className="inline">{data.post?.content || ""}</p>
             </div>
           </div>
           <div className="w-[45%]">
-            <ImageSlider images={images} />
+            <ImageSlider images={data.files} />
           </div>
         </div>
 
         <div className="absolute bottom-0 left-0 w-full h-[5vh] border-t  flex items-center justify-end font-bold px-10 text-sm text-gray-600">
-          <p>{formatDate(post.date, "dot")}</p>
+          <p>{formatDate(data.post?.date, "dot")}</p>
         </div>
       </div>
     </>

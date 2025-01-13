@@ -8,7 +8,7 @@ const alertSlice = createSlice({
   initialState,
   reducers: {
     clearAlert: (state) => {
-      state = [];
+      state.splice(0, state.length);
     },
     delAlert: (state, action) => {
       const { sid, type } = action.payload;

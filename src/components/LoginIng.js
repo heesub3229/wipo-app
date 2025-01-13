@@ -108,7 +108,7 @@ export const saveUser = createAsyncThunk(
     } catch (error) {
       return rejectWithValue({
         status: error.status || 500,
-        message: { data: error.message } || { data: "유저저장실패" },
+        message: error.message || { data: "유저저장실패" },
       });
     }
   }

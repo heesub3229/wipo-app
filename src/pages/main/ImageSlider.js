@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
+import { getFile } from "../../components/Util";
 
 export default function ImageSlider({ images }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -37,7 +38,7 @@ export default function ImageSlider({ images }) {
     sliderRef.current.style.transform = `translateX(-${currentIndex * 100}%)`;
     isDragging.current = false;
   };
-
+  if (!images) return <></>;
   return (
     <div
       className="w-35vw h-50vh border border-dotted rounded-md mx-auto overflow-hidden relative bg-white"
@@ -59,7 +60,7 @@ export default function ImageSlider({ images }) {
             className="flex-shrink-0 w-35vw h-50vh" // 슬라이드 크기 설정
           >
             <img
-              src={image}
+              src={getFile(image.filepath)}
               alt={`Slide ${index + 1}`}
               className="w-full h-full object-contain"
               onDragStart={(e) => e.preventDefault()}

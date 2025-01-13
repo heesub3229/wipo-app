@@ -4,17 +4,26 @@ import Header from "./Header";
 import { Error } from "../../components/Common";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getPostMy } from "../../api/PostApi";
+import { getOtherPost, getPostMy } from "../../api/PostApi";
 import { Cookies } from "react-cookie";
 import Postings from "../posting/Postings";
 
 export default function Main() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const postState_i = useSelector((state) => state.post.post_i);
+  const postState_other = useSelector((state) => state.post.post_other);
   useEffect(() => {
     const cookie = new Cookies();
     if (cookie.get("jwtToken")) {
-      //dispatch(getPostMy({ jwt: cookieState, formData: 0 }));
+      if (postState_i && postState_i.length > 0) {
+      } else {
+        dispatch(getPostMy(0));
+      }
+      if (postState_other && postState_other.length > 0) {
+      } else {
+        dispatch(getOtherPost(0));
+      }
     } else {
       navigate("/");
     }

@@ -29,21 +29,21 @@ export const kakaoSearchKeyword = (search, count) => {
     if (window.kakao && window.kakao.maps) {
       const searchCallback = (data, status, pagination) => {
         if (status === window.kakao.maps.services.Status.OK) {
-          const array = data.map((item, index) => ({
-            id: index + (count ? count : 0),
+          const array = data.map((item) => ({
             placeName: item.place_name,
             addressName: item.address_name,
-            x: item.x,
-            y: item.y,
+            x: Number(item.x),
+            y: Number(item.y),
             region_1depth_name: "",
             region_2depth_name: "",
             region_3depth_name: "",
             favFlag: "N",
             type: "K",
           }));
-          resolve({ data: array, page: pagination }); // 모든 결과 반환
+
+          resolve({ data: array, page: { totalCount: pagination.totalCount } }); // 모든 결과 반환
         } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
-          resolve([]); // 결과 없음
+          resolve({ data: [], page: { totalCount: 0 } }); // 결과 없음
         } else {
           if (status) {
             reject(status);
@@ -53,31 +53,31 @@ export const kakaoSearchKeyword = (search, count) => {
         }
       };
 
-      place.keywordSearch(search, searchCallback, { size: 10 }); // 첫 검색 요청
+      place.keywordSearch(search, searchCallback, { size: 10 + count }); // 첫 검색 요청
     } else {
       reject("");
     }
   });
 };
 
-export const kakaoNextPage = (search, nextPage, originCount) => {
+export const kakaoNextPage = (search, nextPage) => {
   return new Promise((resolve, reject) => {
     if (window.kakao && window.kakao.maps) {
       const searchCallback = (data, status, pagination) => {
         if (status === window.kakao.maps.services.Status.OK) {
-          const array = data.map((item, index) => ({
-            id: index + originCount + (nextPage - 1) * 10,
+          const array = data.map((item) => ({
+            //id: index + originCount + (nextPage - 1) * 10,
             placeName: item.place_name,
             addressName: item.address_name,
-            x: item.x,
-            y: item.y,
+            x: Number(item.x),
+            y: Number(item.y),
             region_1depth_name: "",
             region_2depth_name: "",
             region_3depth_name: "",
             favFlag: "N",
             type: "K",
           }));
-          resolve({ data: array, page: pagination }); // 모든 결과 반환
+          resolve({ data: array, page: { totalCount: pagination.totalCount } }); // 모든 결과 반환
         } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
           resolve([]); // 결과 없음
         } else {
@@ -104,16 +104,20 @@ export const kakaoSearchAddress = (search) => {
           const filterArray = data.filter((item) =>
             item.address ? item : item.road_address.road_name === search
           );
-          const array = filterArray.map((item, index) => ({
-            id: index,
+          const array = filterArray.map((item) => ({
+            //id: index,
             placeName: item.address
               ? item.address.address_name
               : item.road_address?.road_name,
             addressName: item.address
               ? item.address.address_name
               : item.road_address?.address_name,
-            x: item.address ? item.address.x : item.road_address?.x,
-            y: item.address ? item.address.y : item.road_address?.y,
+            x: item.address
+              ? Number(item.address.x)
+              : Number(item.road_address?.x),
+            y: item.address
+              ? Number(item.address.y)
+              : Number(item.road_address?.y),
             region_1depth_name: item.address
               ? item.address.region_1depth_name
               : item.road_address?.region_1depth_name,
@@ -124,19 +128,20 @@ export const kakaoSearchAddress = (search) => {
               ? item.address.region_3depth_name
               : item.road_address?.region_3depth_name,
             favFlag: "N",
-            type: item.address ? "A" : "R",
+            type: "R",
           }));
-
           const pageData = {
-            ...pagination,
             totalCount: array.length,
-            last: 1,
-            hasNextPage: false,
           };
 
           resolve({ data: array, page: pageData }); // 모든 결과 반환
         } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
-          resolve([]); // 결과 없음
+          resolve({
+            data: [],
+            page: {
+              totalCount: 0,
+            },
+          }); // 결과 없음
         } else {
           if (status) {
             reject(status);

@@ -10,6 +10,7 @@ const initialState = {
   friendsLength: null,
   friend: [],
   file: { sid: null, filename: null, filepath: null, create_at: null },
+  favList: { page: { totalCount: 0, current: 1 }, data: [] },
 };
 
 const authSlice = createSlice({
@@ -24,16 +25,19 @@ const authSlice = createSlice({
       state.userSid = null;
       state.profileColor = null;
       state.friendsLength = null;
-      state.friend = [];
+      state.friend.splice(0, state.friend.length);
       state.file = {
         sid: null,
         filename: null,
         filepath: null,
         create_at: null,
       };
+      state.favList.page.totalCount = 0;
+      state.favList.page.current = 1;
+      state.favList.data.splice(0, state.favList.data.length);
     },
     saveUserInfo: (state, action) => {
-      const { user, friend } = action.payload;
+      const { user, friend, favList } = action.payload;
       const {
         email,
         dateBirth,
@@ -58,6 +62,10 @@ const authSlice = createSlice({
         state.file.filepath = file.filepath;
         state.file.create_at = file.create_at;
       }
+      state.favList.data = favList.map((item) => ({ ...item, favFlag: "Y" }));
+      state.favList.page.totalCount = favList.length;
+
+      state.favList.page.current = 1;
     },
     changeUserInfo: (state, action) => {
       const { dateBirth, file, friendsLength, profileColor } = action.payload;
@@ -113,9 +121,77 @@ const authSlice = createSlice({
         });
       }
     },
+    pushFavList: (state, action) => {
+      const {
+        addressName,
+        favFlag,
+        placeName,
+        region_1depth_name,
+        region_2depth_name,
+        region_3depth_name,
+        x,
+        y,
+        type,
+      } = action.payload;
+      if (favFlag === "Y") {
+        state.favList.data.push({
+          sid: null,
+          type: type,
+          x: x,
+          y: y,
+          addressName: addressName,
+          favFlag: favFlag,
+          placeName: placeName,
+          region_1depth_name: region_1depth_name,
+          region_2depth_name: region_2depth_name,
+          region_3depth_name: region_3depth_name,
+          create_at: null,
+        });
+      } else {
+        const findIndex = state.favList.data.findIndex(
+          (item) => item.x === x && item.y === y
+        );
+        if (findIndex !== -1) {
+          const findData = state.favList.data[findIndex];
+          if (findData.sid) {
+            findData.favFlag = "N";
+          } else {
+            state.favList.data.splice(findIndex, 1);
+          }
+        }
+      }
+      state.favList.page.current = 1;
+      state.favList.page.totalCount = state.favList.data.length;
+    },
+    changeFavPage: (state, action) => {
+      const page = action.payload;
+      state.favList.page.current = page;
+    },
+    sucFavList: (state, action) => {
+      const data = action.payload;
+      if (Array.isArray(data)) {
+        state.favList.data = state.favList.data.filter((obj) => {
+          const filterObj = data.find(
+            (item) => item.x === obj.x && item.y === obj.y
+          );
+          if (filterObj) {
+            obj.sid = filterObj.sid;
+            return true; // 유지
+          }
+          return obj.favFlag !== "N";
+        });
+      }
+    },
   },
 });
 
-export const { clearAuth, saveUserInfo, pushFriend, changeUserInfo } =
-  authSlice.actions;
+export const {
+  clearAuth,
+  saveUserInfo,
+  pushFriend,
+  changeUserInfo,
+  pushFavList,
+  changeFavPage,
+  sucFavList,
+} = authSlice.actions;
 export default authSlice.reducer;

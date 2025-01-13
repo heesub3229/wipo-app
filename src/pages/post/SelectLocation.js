@@ -9,13 +9,22 @@ import {
   kakaoSearchAddress,
   kakaoSearchKeyword,
 } from "../../components/Util";
+import { useDispatch, useSelector } from "react-redux";
+import { async } from "q";
+import { setFavMap } from "../../api/MapApi";
+import { changeFavPage, pushFavList } from "../../slices/auth";
 
 export default function SelectLocation({ onClose, setPlace }) {
+  const authStateFavList = useSelector((state) => state.auth.favList);
   const [location, setLocation] = useState("");
   const [autoList, setAutoList] = useState([]);
-  const [locationList, setLocationList] = useState([]);
+  const [locationList, setLocationList] = useState({
+    page: authStateFavList.page,
+    data: authStateFavList.data,
+  });
   const [selectedData, setSelectedData] = useState("");
   const [selectedLocation, setSelectedLocation] = useState({});
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const debounceTimeout = setTimeout(() => {
@@ -45,34 +54,26 @@ export default function SelectLocation({ onClose, setPlace }) {
     },
     [] // 1500ms 지연
   );
+
   const searchProc = async (value) => {
     if (value) {
-      setLocationList([]); // 기존 데이터 초기화
+      setLocationList({}); // 기존 데이터 초기화
       debouncedAddress(value, (addrData) => {
         debouncedSearch(
-          {
-            value: value,
-            count: addrData.data.length > 0 ? addrData.data.length : 0,
-          },
+          { value: value, count: addrData.page.totalCount },
           (searchData) => {
             const mergeData = {
-              data: [...(addrData.data || []), ...(searchData.data || [])],
+              data: [...addrData.data, ...searchData.data],
               page: {
-                addrPagination: addrData.page,
-                searchPagination: searchData.page,
+                current: 1,
+                totalCount:
+                  searchData.page.totalCount + addrData.page.totalCount,
               },
             };
-            const addrCount = mergeData.page.addrPagination
-              ? mergeData.page.addrPagination.totalCount
-              : 0;
-            const searchCount = mergeData.page.searchPagination
-              ? mergeData.page.searchPagination.totalCount
-              : 0;
-            const emptyArray = addrCount + searchCount - mergeData.data.length;
-            const mergeCount = mergeData.data.length;
+            const emptyArray =
+              mergeData.page.totalCount - mergeData.data.length;
             for (var i = 0; i < emptyArray; i++) {
               const emptyData = {
-                id: mergeCount + i,
                 placeName: "",
                 addressName: "",
                 x: 0,
@@ -81,14 +82,31 @@ export default function SelectLocation({ onClose, setPlace }) {
                 region_2depth_name: "",
                 region_3depth_name: "",
                 favFlag: "N",
-                type: "K",
+                type: "T",
               };
 
               mergeData.data.push(emptyData);
             }
+
+            mergeData.data.forEach((item) => {
+              const findItem = authStateFavList.data.find(
+                (itemB) =>
+                  Number(itemB.x) === Number(item.x) &&
+                  Number(itemB.y) === Number(item.y)
+              );
+              if (findItem) {
+                item.favFlag = findItem.favFlag;
+              }
+            });
+
             setLocationList(mergeData);
           }
         );
+      });
+    } else {
+      setLocationList({
+        data: authStateFavList.data,
+        page: authStateFavList.page,
       });
     }
   };
@@ -121,22 +139,71 @@ export default function SelectLocation({ onClose, setPlace }) {
   };
 
   const changePage = async (value) => {
-    if (locationList?.page?.searchPagination) {
-      const filterCount = locationList.data.filter((item) => item.type !== "K");
-      const result = await kakaoNextPage(location, value, filterCount.length);
-      const mergeArray = locationList.data.map((item) => {
-        const matchItem = result.data.find((itemB) => itemB.id === item.id);
-
-        if (matchItem) {
-          return { ...item, ...matchItem };
+    if (location) {
+      if (locationList.page?.totalCount) {
+        const count = Math.ceil(locationList.page?.totalCount / 10);
+        if (count >= value && value > 1) {
+          const filterData = locationList.data.filter(
+            (item) => item.type === "R"
+          );
+          const result = await kakaoNextPage(location, value);
+          const mergeArray = locationList.data.map((item, indexA) => {
+            const mergeData = result.data.find(
+              (itemB, indexB) =>
+                indexA === indexB + filterData.length + (value - 1) * 10
+            );
+            if (mergeData) {
+              const findFavData = authStateFavList.data.find(
+                (itemC) =>
+                  Number(itemC.x) === Number(mergeData.x) &&
+                  Number(itemC.y) === Number(mergeData.y)
+              );
+              if (findFavData) {
+                return { ...mergeData, favFlag: findFavData.favFlag };
+              } else {
+                return mergeData;
+              }
+            } else {
+              return item;
+            }
+          });
+          setLocationList((prevData) => ({
+            data: mergeArray,
+            page: { ...prevData.page, current: value },
+          }));
         }
-        return item;
-      });
-      setLocationList((prevData) => ({
-        ...prevData,
-        data: mergeArray,
-        page: { ...prevData.page, searchPagination: result.page },
-      }));
+      }
+    } else {
+      dispatch(changeFavPage(value));
+    }
+  };
+
+  const clickFag = (value) => {
+    if (locationList) {
+      const { data, page } = locationList;
+      if (data) {
+        const findData = data.find(
+          (item) => item.x === value.x && item.y === value.y
+        );
+        if (findData) {
+          const addData = {
+            ...findData,
+            favFlag: findData.favFlag === "Y" ? "N" : "Y",
+          };
+
+          dispatch(pushFavList(addData));
+
+          const filterData = data.map((item) => {
+            if (item.x === value.x && item.y === value.y) {
+              return { ...item, favFlag: item.favFlag === "Y" ? "N" : "Y" };
+            } else {
+              return item;
+            }
+          });
+          setSelectedLocation(addData);
+          setLocationList({ data: filterData, page: page });
+        }
+      }
     }
   };
 
@@ -167,7 +234,7 @@ export default function SelectLocation({ onClose, setPlace }) {
           <div className="border w-1/3 h-full flex flex-col">
             <LocationPage
               locationList={locationList}
-              setLocationList={setLocationList}
+              setLocationList={clickFag}
               setData={selectLocation}
               nextClick={changePage}
             />
