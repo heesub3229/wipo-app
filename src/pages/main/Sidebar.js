@@ -14,6 +14,7 @@ import {
   FaListCheck,
   FaUtensils,
   FaLocationArrow,
+  FaWonSign,
 } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { clearAuth } from "../../slices/auth";
@@ -33,8 +34,12 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   };
   const handleMapClick = () => {};
   const handleChkListClick = () => {};
-  const handleReceiptClick = () => {};
-  const handlePopRest = () => {};
+  const handleLedgerClick = () => {
+    navigate("/Ledger");
+  };
+  const handlePopRest = () => {
+    navigate("/PopRest");
+  };
   const handleNavClick = () => {};
   const handleLogoutClick = async () => {
     const cookie = new Cookies();
@@ -88,9 +93,9 @@ export default function Sidebar({ isOpen, setIsOpen }) {
             handleClick={handleChkListClick}
           />
           <SideButton
-            text="영수증 기록"
-            startIcon={IoReceiptOutline}
-            handleClick={handleReceiptClick}
+            text="가계부"
+            startIcon={FaWonSign}
+            handleClick={handleLedgerClick}
           />
           <SideButton
             text="맛집 기록"

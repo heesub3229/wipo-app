@@ -320,3 +320,40 @@ export const ContentInput = ({ value, placeholder, handleInputChange }) => {
     </div>
   );
 };
+
+export const LedgerInput = ({ title, value, handleInputChange }) => {
+  return (
+    <div className="py-2">
+      <p className="font-bold text-indigo-500 ml-1 mb-2">{title}</p>
+      <div
+        className={`flex items-center bg-gray-50 w-full p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none`}
+      >
+        <input
+          className="w-full bg-gray-50 focus:outline-none text-center"
+          value={value}
+          onChange={(e) => handleInputChange(e.target.value)}
+        />
+      </div>
+    </div>
+  );
+};
+
+export const LedgerAmount = ({ title, value, handleInputChange }) => {
+  return (
+    <div className="py-2">
+      <p className="font-bold text-indigo-500 ml-1 mb-2">{title}</p>
+      <div
+        className={`flex items-center bg-gray-50 w-full p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none`}
+      >
+        <input
+          className="w-full text-right bg-gray-50 focus:outline-none"
+          value={
+            value && value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          }
+          onChange={(e) => handleInputChange(e.target.value)}
+        />
+        <p className="ml-2">원</p>
+      </div>
+    </div>
+  );
+};

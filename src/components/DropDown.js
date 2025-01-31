@@ -436,3 +436,154 @@ export const UserSelect = ({
     </div>
   );
 };
+
+export const LedgerDropDown = React.memo(({ value, type, setData }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [typeArr, setTypeArr] = useState([]);
+  const dropDownRef = useRef();
+  useEffect(() => {
+    if (type === "year") {
+      const years = Array.from(
+        { length: 100 },
+        (_, i) => new Date().getFullYear() - i
+      );
+      setTypeArr(years);
+    }
+
+    if (type === "month") {
+      const month = Array.from({ length: 12 }, (_, i) => i + 1);
+      setTypeArr(month);
+    }
+
+    if (type === "date") {
+      const date = Array.from({ length: 31 }, (_, i) => i + 1);
+      setTypeArr(date);
+    }
+  }, [type]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropDownRef.current && !dropDownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleClick = () => {
+    setIsOpen((prev) => !prev);
+  };
+  return (
+    <div className="w-full relative z-[100] py-2" ref={dropDownRef}>
+      <div
+        className={`flex items-center bg-gray-50 p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none `}
+      >
+        <input
+          className="w-full focus:outline-none font-nanum bg-gray-50 text-center"
+          type="text"
+          value={value}
+          readOnly
+          onClick={() => handleClick()}
+        />
+        {isOpen ? (
+          <FiChevronUp
+            className="text-gray-400 mr-2 cursor-pointer"
+            onClick={() => handleClick()}
+          />
+        ) : (
+          <FiChevronDown
+            className="text-gray-400 mr-2 cursor-pointer"
+            onClick={() => handleClick()}
+          />
+        )}
+      </div>
+      {isOpen && (
+        <div className="absolute left-0 w-full max-h-60 overflow-y-auto p-2 mt-1 bg-white border rounded shadow-xl select-none">
+          {typeArr.map((item) => (
+            <div
+              key={item}
+              className="p-2 cursor-pointer hover:bg-gray-100"
+              onClick={() => {
+                handleClick();
+                setData(item);
+              }}
+            >
+              {item}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+});
+
+export const LedgerCategory = ({ title, value, list, setData }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropDownRef = useRef();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropDownRef.current && !dropDownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleOpen = () => {
+    setIsOpen((prev) => !prev);
+  };
+
+  return (
+    <div className="w-full relative z-50 py-2" ref={dropDownRef}>
+      <p className="font-bold text-indigo-500 ml-1 mb-2">{title}</p>
+      <div
+        className={`relative flex items-center bg-gray-50 w-full p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none`}
+      >
+        <input
+          className="w-full bg-gray-50 focus:outline-none text-center"
+          value={value}
+          onClick={() => handleOpen()}
+          readOnly
+        />
+        {isOpen ? (
+          <FiChevronUp
+            className="text-gray-400 mr-2 cursor-pointer"
+            onClick={() => handleOpen()}
+          />
+        ) : (
+          <FiChevronDown
+            className="text-gray-400 mr-2 cursor-pointer"
+            onClick={() => handleOpen()}
+          />
+        )}
+      </div>
+      {isOpen && Array.isArray(list) && list.length > 0 && (
+        <div className="absolute w-full max-h-80 overflow-y-auto p-2 mt-1 bg-white border rounded shadow-xl font-nanum">
+          {list.map((item, index) => (
+            <div
+              key={index}
+              className="p-2 cursor-pointer hover:bg-gray-100"
+              onClick={() => {
+                setIsOpen(false);
+                setData(item.code);
+              }}
+            >
+              <p>{item.name}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};

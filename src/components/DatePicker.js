@@ -59,6 +59,7 @@ const DatePicker = ({ isOpen, setIsOpen, setDate }) => {
       12
     );
     setSelectedDate(newDate);
+    setIsOpen(false);
   };
 
   const handlePrevMonth = () => {

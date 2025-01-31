@@ -31,6 +31,7 @@ export const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   const handleBackgroundClick = (e) => {
+    e.stopPropagation();
     if (e.target === e.currentTarget) {
       onClose();
     }
