@@ -21,7 +21,6 @@ export default function LedgerMain() {
       <div className="flex-grow flex justify-center items-center pt-10vh">
         <div className="w-4/5 min-h-[90vh] bg-white rounded-t-lg p-10">
           <LedgerTop />
-          <LedgerMid />
         </div>
       </div>
       <div

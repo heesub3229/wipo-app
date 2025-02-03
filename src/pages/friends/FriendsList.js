@@ -34,7 +34,7 @@ export default function FriendsList() {
                 </div>
               ) : (
                 <img
-                  className="w-12 h-12 rounded-full flex justify-center items-center "
+                  className="w-12 h-12 bg-white rounded-full flex justify-center items-center "
                   src={getFile(item.file?.filepath)}
                   alt="Profile"
                 />

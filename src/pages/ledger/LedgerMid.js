@@ -107,8 +107,8 @@ export default function LedgerMid() {
   const handleNextClick = () => {};
 
   return (
-    <div className="flex flex-col w-full justify-center items-center pt-12">
-      <div className="flex items-center text-xl font-bold space-x-7 select-none pb-14">
+    <div className="flex flex-col w-full justify-center items-center pt-5">
+      <div className="flex items-center text-xl font-bold space-x-7 select-none pb-7">
         <div className="rounded-full hover:bg-gray-100 p-2 cursor-pointer">
           <FaAngleLeft onClick={() => handlePrevClick()} />
         </div>
@@ -117,46 +117,53 @@ export default function LedgerMid() {
           <FaAngleRight onClick={() => handleNextClick()} />
         </div>
       </div>
-      {data.map((item) => (
-        <div
-          className="w-3/5 flex flex-col space-y-2 border-b p-5 hover:bg-gray-100"
-          onClick={() => {
-            handleListClick(item.sid);
-          }}
-        >
-          <p className="text-gray-600 mb-1">
-            {formatDate(item.date, "MonthDay")}
-          </p>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <LedgerChip category={item.category} />
-              <p className="text-xl font-bold">{item.name}</p>
-            </div>
-            <div>
-              <p className="text-right">
-                {item.payment === "C" ? "카드" : "현금"}
-              </p>
-              {item.type === "E" ? (
-                <p className="text-lg font-bold text-red-500">
-                  -
-                  {item.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                  원
+      <div className="w-[90%] h-[440px] overflow-auto px-3">
+        {data.map((item) => (
+          <div
+            key={item.sid}
+            className="w-full flex flex-col space-y-2 border-b p-4 hover:bg-gray-100"
+            onClick={() => {
+              handleListClick(item.sid);
+            }}
+          >
+            <p className="text-sm text-gray-600 mb-1">
+              {formatDate(item.date, "MonthDay")}
+            </p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <LedgerChip category={item.category} />
+                <p className="text-lg font-bold">{item.name}</p>
+              </div>
+              <div>
+                <p className="text-right">
+                  {item.payment === "C" ? "카드" : "현금"}
                 </p>
-              ) : (
-                <p className="text-lg font-bold text-blue-500">
-                  {item.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                  원
-                </p>
-              )}
+                {item.type === "E" ? (
+                  <p className="font-bold text-red-500">
+                    -
+                    {item.amount
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    원
+                  </p>
+                ) : (
+                  <p className="font-bold text-blue-500">
+                    {item.amount
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    원
+                  </p>
+                )}
+              </div>
             </div>
+            {openModal === item.sid && (
+              <Modal isOpen={!!openModal} onClose={handleCloseModal}>
+                <LedgerModal data={item} />
+              </Modal>
+            )}
           </div>
-          {openModal === item.sid && (
-            <Modal isOpen={!!openModal} onClose={handleCloseModal}>
-              <LedgerModal data={item} />
-            </Modal>
-          )}
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
