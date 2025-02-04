@@ -7,6 +7,7 @@ import {
   FaCheck,
   FaXmark,
   FaPaintbrush,
+  FaWonSign,
 } from "react-icons/fa6";
 import { useDispatch } from "react-redux";
 import { UnderLineDateInput, UnderLineInput } from "../../components/TextField";
@@ -27,6 +28,7 @@ export default function MyPage({ userInfo, onClose }) {
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [date, setDate] = useState("");
+  const [defaultDay, setDefaultDay] = useState(1);
   const [color, setColor] = useState(userInfo.profileColor || "Purple");
   const [showPalette, setShowPalette] = useState(false);
   const [onOffPalette, setOnOffPalette] = useState(false);
@@ -45,6 +47,9 @@ export default function MyPage({ userInfo, onClose }) {
     }
     if (userInfo?.color) {
       setColor(userInfo?.color);
+    }
+    if (userInfo?.defaultDay) {
+      setDefaultDay(userInfo?.defaultDay);
     }
   }, [userInfo]);
 
@@ -114,6 +119,9 @@ export default function MyPage({ userInfo, onClose }) {
     }
     if (image) {
       formData.append("image", image);
+    }
+    if (defaultDay) {
+      formData.append("defaultDay", defaultDay);
     }
     const res = await dispatch(setProfile(formData));
     if (res) {
@@ -224,7 +232,7 @@ export default function MyPage({ userInfo, onClose }) {
       </div>
       <div className="pt-[250px] ">
         <p className="pl-[270px] font-bold text-2xl">{name}</p>
-        <div className="mt-[80px] w-full flex justify-center items-center">
+        <div className="mt-[60px] w-full flex justify-center items-center">
           <div className="w-4/5">
             <UnderLineInput
               value={email}
@@ -260,10 +268,31 @@ export default function MyPage({ userInfo, onClose }) {
                 textSize="text-lg"
               />
             </div>
+            <div className="w-2/5">
+              <UnderLineDropDown
+                id="date"
+                type="date"
+                value={defaultDay && defaultDay}
+                setData={setDefaultDay}
+                startIcon={FaWonSign}
+                textSize="text-lg"
+              />
+            </div>
+
+            {defaultDay === 1 ? (
+              <p className="text-sm mt-1">
+                * 가계부 기준일 설정 | 현재 예시 : 5월 1일 ~ 4월 30일
+              </p>
+            ) : (
+              <p className="text-sm mt-1">
+                * 가계부 기준일 설정 | 현재 예시 : 5월 {defaultDay}일 ~ 6월{" "}
+                {defaultDay - 1}일
+              </p>
+            )}
           </div>
         </div>
         {/* 총 포스팅 수, 친구 수 */}
-        <div className="pt-[70px] flex justify-evenly items-center">
+        <div className="pt-[30px] flex justify-evenly items-center">
           <div className="flex flex-col justify-center items-center space-y-2">
             <p className="font-bold text-gray-700">Posting</p>
             <p>16</p>
