@@ -339,6 +339,19 @@ export const LedgerInput = ({ title, value, handleInputChange }) => {
 };
 
 export const LedgerAmount = ({ title, value, handleInputChange }) => {
+  const formatNumber = (num) => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const handleChange = (e) => {
+    const inputValue = e.target.value.replace(/,/g, "");
+    if (!isNaN(inputValue) && inputValue !== "") {
+      handleInputChange(inputValue);
+    } else if (inputValue === "") {
+      handleInputChange("");
+    }
+  };
+
   return (
     <div className="py-2">
       <p className="font-bold text-indigo-500 ml-1 mb-2">{title}</p>
@@ -347,10 +360,8 @@ export const LedgerAmount = ({ title, value, handleInputChange }) => {
       >
         <input
           className="w-full text-right bg-gray-50 focus:outline-none"
-          value={
-            value && value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-          }
-          onChange={(e) => handleInputChange(e.target.value)}
+          value={value ? formatNumber(value) : ""}
+          onChange={handleChange}
         />
         <p className="ml-2">원</p>
       </div>
