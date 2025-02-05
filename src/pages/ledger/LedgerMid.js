@@ -91,6 +91,46 @@ const data = [
 
 export default function LedgerMid() {
   const [openModal, setOpenModal] = useState(null);
+  const [defaultDay, setDefaultDay] = useState(3);
+  const today = new Date();
+  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1);
+
+  const getPeriod = () => {
+    const prevMonthDate = new Date(currentYear, currentMonth - 2, defaultDay);
+    const currentMonthLastDate = new Date(
+      currentYear,
+      currentMonth,
+      0
+    ).getDate();
+
+    const startDate =
+      defaultDay === 1
+        ? `${currentYear}년 ${String(currentMonth).padStart(2, "0")}월 01일`
+        : `${prevMonthDate.getFullYear()}년 ${String(
+            prevMonthDate.getMonth() + 1
+          ).padStart(2, "0")}월 ${String(defaultDay).padStart(2, "0")}일`;
+
+    let endDateRaw =
+      defaultDay === 1
+        ? `${currentYear}-${String(currentMonth).padStart(2, "0")}-${String(
+            currentMonthLastDate
+          ).padStart(2, "0")}`
+        : `${currentYear}-${String(currentMonth).padStart(2, "0")}-${String(
+            defaultDay - 1
+          ).padStart(2, "0")}`;
+
+    const endDateObj = new Date(endDateRaw);
+
+    let endDate =
+      endDateObj > today
+        ? "오늘"
+        : `${currentYear}년 ${String(currentMonth).padStart(2, "0")}월 ${
+            defaultDay === 1 ? currentMonthLastDate : defaultDay - 1
+          }일`;
+
+    return `${startDate} ~ ${endDate}`;
+  };
 
   const handleListClick = (sid) => {
     setOpenModal(sid);
@@ -102,9 +142,25 @@ export default function LedgerMid() {
     }
   };
 
-  const handlePrevClick = () => {};
+  const handlePrevClick = () => {
+    setCurrentMonth((prevMonth) => {
+      if (prevMonth === 1) {
+        setCurrentYear((prevYear) => prevYear - 1);
+        return 12;
+      }
+      return prevMonth - 1;
+    });
+  };
 
-  const handleNextClick = () => {};
+  const handleNextClick = () => {
+    setCurrentMonth((prevMonth) => {
+      if (prevMonth === 12) {
+        setCurrentYear((prevYear) => prevYear + 1);
+        return 1;
+      }
+      return prevMonth + 1;
+    });
+  };
 
   return (
     <div className="flex flex-col w-full justify-center items-center pt-5">
@@ -112,7 +168,7 @@ export default function LedgerMid() {
         <div className="rounded-full hover:bg-gray-100 p-2 cursor-pointer">
           <FaAngleLeft onClick={() => handlePrevClick()} />
         </div>
-        <p>2025년 1월 1일 ~ 오늘</p>
+        <p>{getPeriod()}</p>
         <div className="rounded-full hover:bg-gray-100 p-2 cursor-pointer">
           <FaAngleRight onClick={() => handleNextClick()} />
         </div>
