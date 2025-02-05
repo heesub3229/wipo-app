@@ -197,9 +197,12 @@ export const CancelBtn = ({ handleClick }) => {
   );
 };
 
-export const LedgerSave = () => {
+export const LedgerSave = ({ handleClick }) => {
   return (
-    <div className="flex items-center bg-indigo-400 hover:bg-indigo-500 cursor-pointer text-white rounded-md px-4 py-1">
+    <div
+      className="flex items-center bg-indigo-400 hover:bg-indigo-500 cursor-pointer text-white rounded-md px-4 py-1"
+      onClick={() => handleClick()}
+    >
       <p>저장</p>
     </div>
   );
