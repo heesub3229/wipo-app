@@ -1,6 +1,7 @@
 import moment from "moment-timezone";
 import MarkedPlace from "../pages/post/MarkedPlace";
 import ReactDOMServer from "react-dom/server";
+import { useSelector } from "react-redux";
 const place = new window.kakao.maps.services.Places();
 const geocoder = new window.kakao.maps.services.Geocoder();
 const serverUrl = process.env.REACT_APP_SERVER_API;
@@ -277,4 +278,49 @@ export const getFile = (filepath) => {
   const convFilepath = String(filepath).substring(1);
 
   return serverUrl + convFilepath;
+};
+
+export const getPeriod = (defaultDay, select) => {
+  const today = new Date();
+  const todayDate = today.getDate();
+
+  let startDateRaw;
+  if (todayDate >= defaultDay) {
+    startDateRaw = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1 - select,
+      defaultDay
+    );
+  } else {
+    if (today.getMonth() + 1 === 1) {
+      startDateRaw = new Date(today.getFullYear() - 1, 11, defaultDay);
+    } else {
+      startDateRaw = new Date(
+        today.getFullYear(),
+        today.getMonth() - select,
+        defaultDay
+      );
+    }
+  }
+
+  const startDate = `${startDateRaw.getFullYear()}년 ${String(
+    startDateRaw.getMonth() + 1
+  ).padStart(2, "0")}월 ${String(startDateRaw.getDate()).padStart(2, "0")}일`;
+
+  let endDateRaw = new Date(
+    startDateRaw.getFullYear(),
+    startDateRaw.getMonth() + 1,
+    defaultDay - 1
+  );
+
+  let endDate;
+  if (select === 1) {
+    endDate = "오늘";
+  } else {
+    endDate = `${endDateRaw.getFullYear()}년 ${String(
+      endDateRaw.getMonth() + 1
+    ).padStart(2, "0")}월 ${String(endDateRaw.getDate()).padStart(2, "0")}일`;
+  }
+
+  return `${startDate} ~ ${endDate}`;
 };

@@ -4,6 +4,9 @@ import { LedgerChip } from "../../components/Chips";
 import { formatDate } from "../../components/Common";
 import { Modal } from "../../components/Modal";
 import LedgerModal from "./LedgerModal";
+import { useDispatch, useSelector } from "react-redux";
+import { getPeriod } from "../../components/Util";
+import { afterSelect, beforeSelect } from "../../slices/rcpt";
 
 const data = [
   {
@@ -91,46 +94,13 @@ const data = [
 
 export default function LedgerMid() {
   const [openModal, setOpenModal] = useState(null);
-  const [defaultDay, setDefaultDay] = useState(3);
+  const dispatch = useDispatch();
+  const selectState = useSelector((state) => state.rcpt);
+  const defaultDay = useSelector((state) => state.auth.defaultDay);
+
+  const [datePage, setDatePage] = useState(1);
   const today = new Date();
-  const [currentYear, setCurrentYear] = useState(today.getFullYear());
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1);
-
-  const getPeriod = () => {
-    const prevMonthDate = new Date(currentYear, currentMonth - 2, defaultDay);
-    const currentMonthLastDate = new Date(
-      currentYear,
-      currentMonth,
-      0
-    ).getDate();
-
-    const startDate =
-      defaultDay === 1
-        ? `${currentYear}년 ${String(currentMonth).padStart(2, "0")}월 01일`
-        : `${prevMonthDate.getFullYear()}년 ${String(
-            prevMonthDate.getMonth() + 1
-          ).padStart(2, "0")}월 ${String(defaultDay).padStart(2, "0")}일`;
-
-    let endDateRaw =
-      defaultDay === 1
-        ? `${currentYear}-${String(currentMonth).padStart(2, "0")}-${String(
-            currentMonthLastDate
-          ).padStart(2, "0")}`
-        : `${currentYear}-${String(currentMonth).padStart(2, "0")}-${String(
-            defaultDay - 1
-          ).padStart(2, "0")}`;
-
-    const endDateObj = new Date(endDateRaw);
-
-    let endDate =
-      endDateObj > today
-        ? "오늘"
-        : `${currentYear}년 ${String(currentMonth).padStart(2, "0")}월 ${
-            defaultDay === 1 ? currentMonthLastDate : defaultDay - 1
-          }일`;
-
-    return `${startDate} ~ ${endDate}`;
-  };
+  const todayDate = today.getDate();
 
   const handleListClick = (sid) => {
     setOpenModal(sid);
@@ -143,23 +113,18 @@ export default function LedgerMid() {
   };
 
   const handlePrevClick = () => {
-    setCurrentMonth((prevMonth) => {
-      if (prevMonth === 1) {
-        setCurrentYear((prevYear) => prevYear - 1);
-        return 12;
-      }
-      return prevMonth - 1;
-    });
+    setTimeout(() => {
+      dispatch(beforeSelect(selectState));
+    }, 1000);
   };
 
   const handleNextClick = () => {
-    setCurrentMonth((prevMonth) => {
-      if (prevMonth === 12) {
-        setCurrentYear((prevYear) => prevYear + 1);
-        return 1;
-      }
-      return prevMonth + 1;
-    });
+    if (selectState.select === 1) {
+      return;
+    }
+    setTimeout(() => {
+      dispatch(afterSelect(selectState));
+    }, 1000);
   };
 
   return (
@@ -168,8 +133,15 @@ export default function LedgerMid() {
         <div className="rounded-full hover:bg-gray-100 p-2 cursor-pointer">
           <FaAngleLeft onClick={() => handlePrevClick()} />
         </div>
-        <p>{getPeriod()}</p>
-        <div className="rounded-full hover:bg-gray-100 p-2 cursor-pointer">
+        <p>{getPeriod(defaultDay, selectState.select.listSelect)}</p>
+
+        <div
+          className={`rounded-full ${
+            selectState.select.listSelect === 1
+              ? "text-gray-400"
+              : "hover:bg-gray-100 cursor-pointer"
+          }  p-2`}
+        >
           <FaAngleRight onClick={() => handleNextClick()} />
         </div>
       </div>
