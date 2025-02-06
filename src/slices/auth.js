@@ -11,6 +11,7 @@ const initialState = {
   friend: [],
   file: { sid: null, filename: null, filepath: null, create_at: null },
   favList: { page: { totalCount: 0, current: 1 }, data: [] },
+  defaultDay: 1,
 };
 
 const authSlice = createSlice({
@@ -25,7 +26,9 @@ const authSlice = createSlice({
       state.userSid = null;
       state.profileColor = null;
       state.friendsLength = null;
-      state.friend.splice(0, state.friend.length);
+      state.friend
+        ? state.friend.splice(0, state.friend.length)
+        : (state.friend = []);
       state.file = {
         sid: null,
         filename: null,
@@ -34,10 +37,12 @@ const authSlice = createSlice({
       };
       state.favList.page.totalCount = 0;
       state.favList.page.current = 1;
-      state.favList.data.splice(0, state.favList.data.length);
+      state.favList.data
+        ? state.favList.data.splice(0, state.favList.data.length)
+        : (state.favList.data = []);
     },
     saveUserInfo: (state, action) => {
-      const { user, friend, favList } = action.payload;
+      const { user, friend, favList, iamount, eamount } = action.payload;
       const {
         email,
         dateBirth,
@@ -47,6 +52,7 @@ const authSlice = createSlice({
         logintype,
         friendsLength,
         file,
+        defaultDay,
       } = user;
       state.userSid = sid;
       state.dateBirth = dateBirth;
@@ -64,11 +70,12 @@ const authSlice = createSlice({
       }
       state.favList.data = favList.map((item) => ({ ...item, favFlag: "Y" }));
       state.favList.page.totalCount = favList.length;
-
       state.favList.page.current = 1;
+      state.defaultDay = defaultDay ? defaultDay : 1;
     },
     changeUserInfo: (state, action) => {
-      const { dateBirth, file, friendsLength, profileColor } = action.payload;
+      const { dateBirth, file, friendsLength, profileColor, defaultDay } =
+        action.payload;
       state.dateBirth = dateBirth;
       if (file) {
         state.file.sid = file.sid;
@@ -78,6 +85,7 @@ const authSlice = createSlice({
       }
       state.friendsLength = friendsLength;
       state.profileColor = profileColor;
+      state.defaultDay = defaultDay ? defaultDay : 1;
     },
     pushFriend: (state, action) => {
       const {
