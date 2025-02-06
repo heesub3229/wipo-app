@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  select: 1,
+  select: { listSelect: 1, monthSelect: 1, daySelect: 1 },
   rcptList: [],
   rcptGraph_i_day: [],
   rcptGraph_e_day: [],
@@ -14,11 +14,11 @@ const rcptSlice = createSlice({
   initialState,
   reducers: {
     beforeSelect: (state) => {
-      state.select = state.select + 1;
+      state.select.listSelect = state.select.listSelect + 1;
     },
     afterSelect: (state) => {
-      if (state.select > 1) {
-        state.select = state.select - 1;
+      if (state.select.listSelect > 1) {
+        state.select.listSelect = state.select.listSelect - 1;
       }
     },
     saveRcptRes: (state, action) => {
