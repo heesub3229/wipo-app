@@ -2,6 +2,7 @@ import moment from "moment-timezone";
 import MarkedPlace from "../pages/post/MarkedPlace";
 import ReactDOMServer from "react-dom/server";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
 const place = new window.kakao.maps.services.Places();
 const geocoder = new window.kakao.maps.services.Geocoder();
 const serverUrl = process.env.REACT_APP_SERVER_API;
@@ -280,7 +281,7 @@ export const getFile = (filepath) => {
   return serverUrl + convFilepath;
 };
 
-export const getPeriod = (defaultDay, select) => {
+export const getPeriod = (defaultDay, select, selectedMonth) => {
   const today = new Date();
   const todayDate = today.getDate();
 
@@ -322,5 +323,8 @@ export const getPeriod = (defaultDay, select) => {
     ).padStart(2, "0")}월 ${String(endDateRaw.getDate()).padStart(2, "0")}일`;
   }
 
-  return `${startDate} ~ ${endDate}`;
+  return {
+    period: `${startDate} ~ ${endDate}`, // 기존 결과
+    startDateRaw, // startDateRaw도 함께 반환!
+  };
 };

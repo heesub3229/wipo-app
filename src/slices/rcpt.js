@@ -21,6 +21,9 @@ const rcptSlice = createSlice({
         state.select.listSelect = state.select.listSelect - 1;
       }
     },
+    moveSelect: (state, action) => {
+      state.select.listSelect = state.select.listSelect + action.payload;
+    },
     saveRcptRes: (state, action) => {
       const { sid, amount, category, date, payment, type, listFlag, memo } =
         action.payload;
@@ -125,5 +128,6 @@ const rcptSlice = createSlice({
   },
 });
 
-export const { saveRcptRes, beforeSelect, afterSelect } = rcptSlice.actions;
+export const { saveRcptRes, beforeSelect, afterSelect, moveSelect } =
+  rcptSlice.actions;
 export default rcptSlice.reducer;

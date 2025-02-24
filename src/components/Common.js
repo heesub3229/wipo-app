@@ -41,10 +41,7 @@ export const Loading = () => {
 };
 
 export const Success = () => {
-  const isSuccess = useSelector((state) =>
-    // 수정해야함
-    Object.values(state.api).some((api) => api?.loading)
-  );
+  const isSuccess = false;
   return (
     isSuccess && (
       <div className="fixed inset-0 flex justify-center items-center z-50 pointer-events-auto">
@@ -165,6 +162,8 @@ export const formatDate = (dateString, type) => {
     return `${year} . ${month} . ${day}`;
   } else if (type === "kr") {
     return `${year}년 ${month}월 ${day}일`;
+  } else if (type === "MonthDay") {
+    return `${month}월 ${day}일`;
   } else {
     return `${year}-${month}-${day}`;
   }
@@ -208,7 +207,7 @@ export const ToggleBtn = ({ isOn, handleToggle }) => {
   return (
     <div
       className={`w-14 h-7 flex items-center rounded-full p-1 cursor-pointer transition-colors ${
-        isOn ? "bg-indigo-500" : "bg-indigo-200"
+        isOn ? "bg-indigo-500" : "bg-gray-200"
       }`}
       onClick={handleToggle}
     >

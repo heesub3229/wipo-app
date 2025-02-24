@@ -91,7 +91,7 @@ export default function LedgerChart({ data, type }) {
           <FaAngleRight />
         </div>
       </div>
-      <ResponsiveContainer width="100%" height="80%">
+      <ResponsiveContainer width="100%" height="75%">
         <LineChart
           data={getDisplayedData()}
           margin={{ top: 10, left: 40, right: 40 }}

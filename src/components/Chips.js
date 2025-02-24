@@ -11,54 +11,31 @@ import {
   FaB,
 } from "react-icons/fa6";
 
-export const LedgerChip = ({ category }) => {
+const categoryMap = {
+  F: { icon: FaUtensils, color: "bg-rose-400" },
+  T: { icon: FaBusSimple, color: "bg-blue-400" },
+  S: { icon: FaBuilding, color: "bg-yellow-400" },
+  E: { icon: FaParachuteBox, color: "bg-orange-400" },
+  H: { icon: FaHeartPulse, color: "bg-pink-400" },
+  L: { icon: FaHouseChimney, color: "bg-teal-400" },
+  A: { icon: FaCoins, color: "bg-lime-400" },
+  O: { icon: FaEllipsis, color: "bg-neutral-400" },
+  B: { icon: FaB, color: "bg-violet-400" },
+};
+
+export const LedgerChip = ({ category, disabled }) => {
+  const item = categoryMap[category];
+  if (!item) return null;
+
+  const IconComponent = item.icon;
+
   return (
-    <>
-      {category === "F" && (
-        <div className="text-sm flex justify-center rounded-full p-2 bg-rose-400 font-bold text-white">
-          <FaUtensils />
-        </div>
-      )}
-      {category === "T" && (
-        <div className="text-sm flex justify-center rounded-full p-2 bg-blue-400 font-bold text-white">
-          <FaBusSimple />
-        </div>
-      )}
-      {category === "S" && (
-        <div className="text-sm flex justify-center rounded-full p-2 bg-yellow-400 font-bold text-white">
-          <FaBuilding />
-        </div>
-      )}
-      {category === "E" && (
-        <div className="text-sm flex justify-center rounded-full p-2 bg-orange-400 font-bold text-white">
-          <FaParachuteBox />
-        </div>
-      )}
-      {category === "H" && (
-        <div className="text-sm flex justify-center rounded-full p-2 bg-pink-400 font-bold text-white">
-          <FaHeartPulse />
-        </div>
-      )}
-      {category === "L" && (
-        <div className="text-sm flex justify-center rounded-full p-2 bg-teal-400 font-bold text-white">
-          <FaHouseChimney />
-        </div>
-      )}
-      {category === "A" && (
-        <div className="text-sm flex justify-center rounded-full p-2 bg-lime-400 font-bold text-white">
-          <FaCoins />
-        </div>
-      )}
-      {category === "O" && (
-        <div className="text-sm flex justify-center rounded-full p-2 bg-neutral-400 font-bold text-white">
-          <FaEllipsis />
-        </div>
-      )}
-      {category === "B" && (
-        <div className="text-sm flex justify-center rounded-full p-2 bg-violet-400 font-bold text-white">
-          <FaB />
-        </div>
-      )}
-    </>
+    <div
+      className={`text-sm flex justify-center rounded-full p-2 ${
+        disabled === "Y" ? "bg-gray-300" : item.color
+      } font-bold text-white`}
+    >
+      <IconComponent />
+    </div>
   );
 };

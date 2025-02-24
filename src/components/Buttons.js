@@ -117,11 +117,15 @@ export const SideBottomButton = ({
   );
 };
 
-export const CalendarIconButton = ({ icon: Icon, handleClick }) => {
+export const CalendarIconButton = ({ icon: Icon, handleClick, disabled }) => {
   return (
     <div
-      className="p-2 rounded-full hover:bg-gray-100 flex justify-center items-center text-xl text-gray-700 cursor-pointer"
-      onClick={() => handleClick()}
+      className={`p-2 rounded-full ${
+        disabled
+          ? "text-gray-300"
+          : "hover:bg-gray-100 text-gray-700 cursor-pointer"
+      } flex justify-center items-center text-xl`}
+      onClick={() => !disabled && handleClick()}
     >
       <Icon />
     </div>
