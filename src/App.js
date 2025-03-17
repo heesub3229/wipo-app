@@ -13,6 +13,7 @@ import Main from "./pages/main/Main";
 import { Error, Loading } from "./components/Common";
 import WritePost from "./pages/post/WritePost";
 import { PutStream } from "./api/UserApi";
+import LedgerMain from "./pages/ledger/LedgerMain";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/Kakao" element={<KakaoLogin />} />
           <Route path="/google" element={<GoogleLogin />} />
           <Route path="/Main" element={<Main />} />
+          <Route path="/Ledger" element={<LedgerMain />} />
         </Routes>
         <PutStream />
         <Loading />

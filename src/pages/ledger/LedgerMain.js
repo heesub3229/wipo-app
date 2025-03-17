@@ -8,7 +8,6 @@ import LedgerModal from "./LedgerModal";
 
 export default function LedgerMain() {
   const [openModal, setOpenModal] = useState(false);
-
   const handleOpenModal = () => {
     setOpenModal(true);
   };

@@ -1,8 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { LedgerAmount, LedgerInput } from "../../components/TextField";
+import {
+  LedgerAmount,
+  LedgerConv,
+  LedgerInput,
+} from "../../components/TextField";
 import { LedgerCategory, LedgerDropDown } from "../../components/DropDown";
-import { LedgerCancel, LedgerSave } from "../../components/Buttons";
+import {
+  LedgerBtn,
+  LedgerCancel,
+  LedgerSave,
+  OutlinedButton,
+} from "../../components/Buttons";
 import { categoryList, paymentList, typeList } from "../../components/Lists";
+import { changeDateStr, pageAndDate } from "../../components/Util";
+import { useDispatch, useSelector } from "react-redux";
+import { setRcptSave } from "../../api/RcptApi";
+import { saveRcptRes } from "../../slices/rcpt";
+import { pushError } from "../../slices/error";
 
 export default function LedgerModal({ data, onClose }) {
   const today = new Date();
@@ -14,6 +28,9 @@ export default function LedgerModal({ data, onClose }) {
   const [category, setCategory] = useState("");
   const [content, setContent] = useState("");
   const [amount, setAmount] = useState(null);
+  const dispatch = useDispatch();
+  const authStateDay = useSelector((state) => state.auth.defaultDay);
+  const rcptStateSelect = useSelector((state) => state.rcpt.select.listSelect);
 
   useEffect(() => {
     if (data) {
@@ -36,9 +53,40 @@ export default function LedgerModal({ data, onClose }) {
     setAmount(value);
   };
 
-  const handleSaveClick = () => {};
+  const handleSaveClick = async () => {
+    const formData = {
+      sid: data?.sid ? data.sid : null,
+      type: type,
+      amount: amount,
+      category: category,
+      payment: payment,
+      date: changeDateStr(year, month, date),
+      memo: content,
+    };
+
+    const res = await dispatch(setRcptSave(formData));
+    if (res.payload) {
+      const { data, status } = res.payload;
+      if (status === 200) {
+        pageAndDate(rcptStateSelect, formData.date, authStateDay).then(
+          (result) => {
+            const cloneData = structuredClone(data.data);
+            cloneData.listFlag = result;
+            dispatch(saveRcptRes(cloneData));
+          }
+        );
+      }
+    }
+    onClose();
+  };
 
   const handleCancelClick = () => {};
+
+  const handleChangePay = (value) => {
+    const tmpAmount = Number(amount);
+    const tmpValue = Number(value);
+    setAmount(String(tmpAmount + tmpValue));
+  };
 
   return (
     <div className="relative w-[500px] h-[680px] bg-white mt-5 shadow-md rounded-md p-12">
@@ -90,13 +138,34 @@ export default function LedgerModal({ data, onClose }) {
         value={categoryList.find((item) => item.code === category)?.name || ""}
         setData={setCategory}
       />
-      <LedgerAmount
-        title="금액"
-        value={amount}
-        handleInputChange={handleAmountChange}
-      />
+      <div className="flex space-x-2">
+        <LedgerAmount
+          title="금액"
+          value={amount}
+          handleInputChange={handleAmountChange}
+        />
+        <div className="flex items-center justify-between">
+          <LedgerBtn
+            text={"+1만"}
+            handleClick={() => handleChangePay("10000")}
+          />
+          <LedgerBtn
+            text={"+5만"}
+            handleClick={() => handleChangePay("50000")}
+          />
+          <LedgerBtn
+            text={"+10만"}
+            handleClick={() => handleChangePay("100000")}
+          />
+          <LedgerBtn
+            text={"+100만"}
+            handleClick={() => handleChangePay("1000000")}
+          />
+        </div>
+      </div>
+
       <div className="absolute flex space-x-2 bottom-10 right-10">
-        <LedgerSave />
+        <LedgerSave handleClick={() => handleSaveClick()} />
         <LedgerCancel handleClick={() => onClose()} />
       </div>
     </div>

@@ -7,97 +7,16 @@ import { Modal } from "../../components/Modal";
 import LedgerModal from "./LedgerModal";
 import { useDispatch, useSelector } from "react-redux";
 import { getPeriod } from "../../components/Util";
-import { afterSelect, beforeSelect, moveSelect } from "../../slices/rcpt";
+import {
+  afterSelectList,
+  beforeSelectList,
+  moveSelect,
+} from "../../slices/rcpt";
 import LedgerDaySelect from "./LedgerDaySelect";
 import LedgerFilter from "./LedgerFilter";
 import LedgerMonthSelect from "./LedgerMonthSelect";
 
-const ledgerData = [
-  {
-    sid: 1,
-    category: "F",
-    payment: "C",
-    type: "E",
-    amount: 14000,
-    name: "동대문 엽기떡볶이",
-    date: "20250120",
-  },
-  {
-    sid: 2,
-    category: "T",
-    payment: "C",
-    type: "E",
-    amount: 1500,
-    name: "버스",
-    date: "20250119",
-  },
-  {
-    sid: 3,
-    category: "S",
-    payment: "",
-    type: "I",
-    amount: 2500000,
-    name: "월급",
-    date: "20250117",
-  },
-  {
-    sid: 4,
-    category: "E",
-    payment: "C",
-    type: "E",
-    amount: 16000,
-    name: "영화",
-    date: "20250117",
-  },
-  {
-    sid: 5,
-    category: "H",
-    payment: "C",
-    type: "E",
-    amount: 800000,
-    name: "필라테스",
-    date: "20250115",
-  },
-  {
-    sid: 6,
-    category: "L",
-    payment: "H",
-    type: "E",
-    amount: 400000,
-    name: "월세",
-    date: "20250114",
-  },
-  {
-    sid: 7,
-    category: "A",
-    payment: "H",
-    type: "I",
-    amount: 100000,
-    name: "용돈",
-    date: "20250113",
-  },
-  {
-    sid: 8,
-    category: "O",
-    payment: "H",
-    type: "E",
-    amount: 10000,
-    name: "잃어버림",
-    date: "20250110",
-  },
-  {
-    sid: 9,
-    category: "B",
-    payment: "H",
-    type: "I",
-    amount: 500000,
-    name: "상여금",
-    date: "20250118",
-  },
-];
-
 export default function LedgerMid() {
-  const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [openModal, setOpenModal] = useState(null);
   const dispatch = useDispatch();
@@ -122,21 +41,24 @@ export default function LedgerMid() {
   const monthRef = useRef();
 
   useEffect(() => {
-    setData(ledgerData);
-    if (isShowDay) {
-      setFilteredData(data.filter((item) => item.date === date));
-    } else {
-      setFilteredData(data);
-    }
+    if (selectState?.rcptList) {
+      if (isShowDay) {
+        setFilteredData(
+          selectState.rcptList.filter((item) => item.date === date)
+        );
+      } else {
+        setFilteredData(selectState.rcptList);
+      }
 
-    if (clickedCategory.length > 0) {
-      setFilteredData((prevData) =>
-        prevData.filter((item) =>
-          clickedCategory.some((cat) => cat === item.category)
-        )
-      );
+      if (clickedCategory.length > 0) {
+        setFilteredData((prevData) =>
+          prevData.filter((item) =>
+            clickedCategory.some((cat) => cat === item.category)
+          )
+        );
+      }
     }
-  }, [data, date, isShowDay, clickedCategory]);
+  }, [selectState, date, isShowDay, clickedCategory]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -185,8 +107,8 @@ export default function LedgerMid() {
 
   const handlePrevClick = () => {
     setTimeout(() => {
-      dispatch(beforeSelect(selectState));
-    }, 1000);
+      dispatch(beforeSelectList(selectState));
+    }, 500);
   };
 
   const handleNextClick = () => {
@@ -194,8 +116,8 @@ export default function LedgerMid() {
       return;
     }
     setTimeout(() => {
-      dispatch(afterSelect(selectState));
-    }, 1000);
+      dispatch(afterSelectList(selectState));
+    }, 500);
   };
 
   const handleopenMonthSelect = () => {

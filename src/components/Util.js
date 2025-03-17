@@ -26,6 +26,54 @@ export const changeDateStr = (year, month, date) => {
   );
 };
 
+export const pageAndDate = async (page, date, defaultDay) => {
+  const now = new Date();
+  const nowDay = now.getDate();
+  const tempDate = new Date(
+    date.substring(0, 4),
+    date.substring(4, 6) - 1,
+    date.substring(6, 8)
+  );
+  let start;
+  if (nowDay < defaultDay) {
+    start = new Date(now.getFullYear(), now.getMonth() - page, defaultDay);
+  } else {
+    start = new Date(
+      now.getFullYear(),
+      now.getMonth() - (page - 1),
+      defaultDay
+    );
+  }
+  const end = new Date(
+    start.getFullYear(),
+    start.getMonth() + 1,
+    defaultDay - 1
+  );
+  if (start <= tempDate && tempDate <= end) {
+    return true;
+  } else {
+    return false;
+  }
+};
+//yyyy-mm-dd
+export const changeStr_date_yyyymmdd = (date) => {
+  return (
+    date.substring(0, 4) +
+    "-" +
+    date.substring(4, 6) +
+    "-" +
+    date.substring(6, 8)
+  );
+};
+//yyyy-mm
+export const changeStr_date_yyyymm = (date) => {
+  return date.substring(0, 4) + "-" + date.substring(4, 6);
+};
+//mm-dd
+export const changeStr_date_mmdd = (date) => {
+  return date.substring(4, 6) + "-" + date.substring(6, 8);
+};
+
 export const kakaoSearchKeyword = (search, count) => {
   return new Promise((resolve, reject) => {
     if (window.kakao && window.kakao.maps) {
@@ -279,6 +327,32 @@ export const getFile = (filepath) => {
   const convFilepath = String(filepath).substring(1);
 
   return serverUrl + convFilepath;
+};
+
+export const moneyToStr = (value) => {
+  var nums = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  var units = ["", "만", "억", "조"];
+  var ret = "";
+  if (value) {
+    const str = String(value);
+
+    if (str.length > 0) {
+      for (let i = 0; i < str.length; i++) {
+        const tmpNum = Number(str[i]);
+        if (str.length - i - 1 >= 4) {
+          if ((str.length - i - 1) % 4 === 0) {
+            ret = ret + nums[tmpNum] + units[(str.length - i - 1) / 4] + " ";
+          } else {
+            ret = ret + nums[tmpNum];
+          }
+        } else {
+          ret = ret + nums[tmpNum];
+        }
+      }
+    }
+  }
+
+  return ret;
 };
 
 export const getPeriod = (defaultDay, select, selectedMonth) => {

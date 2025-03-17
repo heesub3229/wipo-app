@@ -222,3 +222,14 @@ export const LedgerCancel = ({ handleClick }) => {
     </div>
   );
 };
+
+export const LedgerBtn = ({ text, handleClick }) => {
+  return (
+    <button
+      className="flex whitespace-nowrap items-center text-indigo-500 text-sm hover:bg-indigo-50 cursor-pointer rounded-md px-2 py-1"
+      onClick={() => handleClick()}
+    >
+      <p>{text}</p>
+    </button>
+  );
+};

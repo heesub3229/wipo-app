@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { moneyToStr } from "./Util";
 
 export const LoginInput = React.memo(
   function LoginInput({
@@ -344,7 +345,7 @@ export const LedgerAmount = ({ title, value, handleInputChange }) => {
   };
 
   const handleChange = (e) => {
-    const inputValue = e.target.value.replace(/,/g, "");
+    const inputValue = e.target.value.replace(/[^0-9]/g, "");
     if (!isNaN(inputValue) && inputValue !== "") {
       handleInputChange(inputValue);
     } else if (inputValue === "") {
@@ -364,6 +365,14 @@ export const LedgerAmount = ({ title, value, handleInputChange }) => {
           onChange={handleChange}
         />
         <p className="ml-2">원</p>
+      </div>
+      <div className="flex pr-3 pt-1">
+        <input
+          value={moneyToStr(value)}
+          disabled={true}
+          className="w-full text-sm text-right focus:outline-none focus:none bg-white"
+        />
+        <p className="ml-1">원</p>
       </div>
     </div>
   );

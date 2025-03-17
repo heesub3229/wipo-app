@@ -3,22 +3,44 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   select: { listSelect: 1, monthSelect: 1, daySelect: 1 },
   rcptList: [],
-  rcptGraph_i_day: [],
-  rcptGraph_e_day: [],
-  rcptGraph_i_month: [],
-  rcptGraph_e_month: [],
+  rcptGraph_day: [],
+  rcptGraph_month: [],
+  rcptNowIncome: 0,
+  rcptNowExpense: 0,
 };
 
 const rcptSlice = createSlice({
   name: "rcpt",
   initialState,
   reducers: {
-    beforeSelect: (state) => {
+    beforeSelectList: (state) => {
       state.select.listSelect = state.select.listSelect + 1;
     },
-    afterSelect: (state) => {
+    afterSelectList: (state) => {
       if (state.select.listSelect > 1) {
         state.select.listSelect = state.select.listSelect - 1;
+      } else {
+        state.select.listSelect = 1;
+      }
+    },
+    beforeSelectMonth: (state) => {
+      state.select.monthSelect = state.select.monthSelect + 1;
+    },
+    afterSelectMonth: (state) => {
+      if (state.select.monthSelect > 1) {
+        state.select.monthSelect = state.select.monthSelect - 1;
+      } else {
+        state.select.monthSelect = 1;
+      }
+    },
+    beforeSelectDay: (state) => {
+      state.select.daySelect = state.select.daySelect + 1;
+    },
+    afterSelectDay: (state) => {
+      if (state.select.daySelect > 1) {
+        state.select.daySelect = state.select.daySelect - 1;
+      } else {
+        state.select.daySelect = 1;
       }
     },
     moveSelect: (state, action) => {
@@ -28,73 +50,58 @@ const rcptSlice = createSlice({
       const { sid, amount, category, date, payment, type, listFlag, memo } =
         action.payload;
       //그래프 업데이트
-      if (type === "I") {
-        if (state.rcptGraph_i_day.length > 0) {
-          const findData = state.rcptGraph_i_day.find(
-            (item) => item.date === date
-          );
-          if (findData) {
-            state.rcptGraph_i_day.forEach((item) => {
-              if (item.date === date) {
-                item.amount += amount;
+      if (state.rcptGraph_day.length > 0) {
+        const findData = state.rcptGraph_day.find((item) => item.date === date);
+        if (findData) {
+          state.rcptGraph_day.forEach((item) => {
+            if (item.date === date) {
+              if (type === "E") {
+                item.expense += amount;
+              } else {
+                item.income += amount;
               }
-            });
-          }
-        } else {
-          state.rcptGraph_i_day.push({ date: date, amount: amount });
-        }
-
-        if (state.rcptGraph_i_month.length > 0) {
-          const findData = state.rcptGraph_i_month.find(
-            (item) => item.date === String(date).substring(0, 6)
-          );
-          if (findData) {
-            state.rcptGraph_i_month.forEach((item) => {
-              if (item.date === String(date).substring(0, 6)) {
-                item.amount += amount;
-              }
-            });
-          }
-        } else {
-          state.rcptGraph_i_month.push({
-            date: String(date).substring(0, 6),
-            amount: amount,
+            }
           });
         }
       } else {
-        if (state.rcptGraph_e_day.length > 0) {
-          const findData = state.rcptGraph_e_day.find(
-            (item) => item.date === date
-          );
-          if (findData) {
-            state.rcptGraph_e_day.forEach((item) => {
-              if (item.date === date) {
-                item.amount += amount;
-              }
-            });
-          }
+        if (type === "E") {
+          state.rcptGraph_day.push({ date: date, income: 0, expense: amount });
         } else {
-          state.rcptGraph_e_day.push({ date: date, amount: amount });
+          state.rcptGraph_day.push({ date: date, income: amount, expense: 0 });
         }
+      }
 
-        if (state.rcptGraph_e_month.length > 0) {
-          const findData = state.rcptGraph_e_month.find(
-            (item) => item.date === String(date).substring(0, 6)
-          );
-          if (findData) {
-            state.rcptGraph_e_month.forEach((item) => {
-              if (item.date === String(date).substring(0, 6)) {
-                item.amount += amount;
+      if (state.rcptGraph_month.length > 0) {
+        const findData = state.rcptGraph_month.find(
+          (item) => item.date === String(date).substring(0, 6)
+        );
+        if (findData) {
+          state.rcptGraph_month.forEach((item) => {
+            if (item.date === String(date).substring(0, 6)) {
+              if (type === "E") {
+                item.expense += amount;
+              } else {
+                item.income += amount;
               }
-            });
-          }
-        } else {
-          state.rcptGraph_e_month.push({
+            }
+          });
+        }
+      } else {
+        if (type === "E") {
+          state.rcptGraph_month.push({
             date: String(date).substring(0, 6),
-            amount: amount,
+            income: 0,
+            expense: amount,
+          });
+        } else {
+          state.rcptGraph_month.push({
+            date: String(date).substring(0, 6),
+            income: amount,
+            expense: 0,
           });
         }
       }
+
       //리스트 업데이트
       if (listFlag) {
         state.rcptList.push({
@@ -122,12 +129,40 @@ const rcptSlice = createSlice({
               state.rcptList = data;
             }
           }
+        } else if (type === "getRcptGraphMonth") {
+          const { status } = action.payload;
+          if (status === 200) {
+            const { data, errFlag } = action.payload.data;
+            if (errFlag === false) {
+              state.rcptGraph_month = data;
+              if (state.select.monthSelect === 1) {
+                state.rcptNowIncome = data[data.length - 1].income;
+                state.rcptNowExpense = data[data.length - 1].expense;
+              }
+            }
+          }
+        } else if (type === "getRcptGraphDay") {
+          const { status } = action.payload;
+          if (status === 200) {
+            const { data, errFlag } = action.payload.data;
+            if (errFlag === false) {
+              state.rcptGraph_day = data;
+            }
+          }
         }
       }
     );
   },
 });
 
-export const { saveRcptRes, beforeSelect, afterSelect, moveSelect } =
-  rcptSlice.actions;
+export const {
+  saveRcptRes,
+  beforeSelectList,
+  afterSelectList,
+  beforeSelectMonth,
+  afterSelectMonth,
+  beforeSelectDay,
+  afterSelectDay,
+  moveSelect,
+} = rcptSlice.actions;
 export default rcptSlice.reducer;
