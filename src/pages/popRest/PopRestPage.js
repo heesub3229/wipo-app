@@ -45,10 +45,6 @@ export default function PopRestPage({
     }
   };
 
-  const handleFavClick = (value) => {
-    setLocationList(value);
-  };
-
   return (
     <div className="h-full flex flex-col">
       {/* 리스트 부분 (스크롤 적용) */}
@@ -59,28 +55,6 @@ export default function PopRestPage({
               <div key={index} onClick={() => setData(item)}>
                 <div className="w-full h-auto flex flex-col justify-center px-1 py-2 hover:bg-gray-200 select-none">
                   <div className="flex items-center space-x-1">
-                    <div
-                      className="text-yellow-300 cursor-pointer"
-                      onMouseEnter={() => setHoveredItemId(index)}
-                      onMouseLeave={() => setHoveredItemId(null)}
-                      onClick={(event) => {
-                        handleFavClick(item);
-                        event.stopPropagation();
-                      }}
-                    >
-                      {item.favFlag === "Y" ? (
-                        hoveredItemId === index ? (
-                          <FaRegStar className="text-gray-700" />
-                        ) : (
-                          <FaStar />
-                        )
-                      ) : hoveredItemId === index ? (
-                        <FaStar />
-                      ) : (
-                        <FaRegStar className="text-gray-700" />
-                      )}
-                    </div>
-
                     <p>{item.placeName}</p>
                   </div>
                   <p className="text-sm ml-5">{item.addressName}</p>

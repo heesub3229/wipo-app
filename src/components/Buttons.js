@@ -233,3 +233,29 @@ export const LedgerBtn = ({ text, handleClick }) => {
     </button>
   );
 };
+
+export const LedgerBtnNoBg = ({ showFlag, text, handleClick }) => {
+  return (
+    <div
+      className={`${
+        showFlag ? "hidden" : ""
+      } flex items-center text-indigo-500 hover:bg-indigo-50 cursor-pointer rounded-md px-4 py-1`}
+      onClick={() => handleClick()}
+    >
+      <p>{text}</p>
+    </div>
+  );
+};
+
+export const LedgerBtnBg = ({ showFlag, text, handleClick }) => {
+  return (
+    <div
+      className={`${
+        showFlag ? "hidden" : ""
+      } flex items-center bg-indigo-400 hover:bg-indigo-500 cursor-pointer text-white rounded-md px-4 py-1`}
+      onClick={() => handleClick()}
+    >
+      <p>{text}</p>
+    </div>
+  );
+};

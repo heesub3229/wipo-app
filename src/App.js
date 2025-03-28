@@ -14,6 +14,7 @@ import { Error, Loading } from "./components/Common";
 import WritePost from "./pages/post/WritePost";
 import { PutStream } from "./api/UserApi";
 import LedgerMain from "./pages/ledger/LedgerMain";
+import PopRestMain from "./pages/popRest/PopRestMain";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Route path="/google" element={<GoogleLogin />} />
           <Route path="/Main" element={<Main />} />
           <Route path="/Ledger" element={<LedgerMain />} />
+          <Route path="/PopRest" element={<PopRestMain />} />
         </Routes>
         <PutStream />
         <Loading />

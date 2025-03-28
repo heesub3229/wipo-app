@@ -2,7 +2,7 @@ import moment from "moment-timezone";
 import MarkedPlace from "../pages/post/MarkedPlace";
 import ReactDOMServer from "react-dom/server";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 const place = new window.kakao.maps.services.Places();
 const geocoder = new window.kakao.maps.services.Geocoder();
 const serverUrl = process.env.REACT_APP_SERVER_API;
@@ -401,4 +401,33 @@ export const getPeriod = (defaultDay, select, selectedMonth) => {
     period: `${startDate} ~ ${endDate}`, // 기존 결과
     startDateRaw, // startDateRaw도 함께 반환!
   };
+};
+
+export const objToStr = (obj, key, value) => {
+  var ret = "";
+  if (obj && Object.keys(obj).length > 0) {
+    if (Object.keys(obj).includes(key)) {
+      ret = obj[key];
+    } else {
+      ret = value;
+    }
+  } else {
+    ret = value;
+  }
+
+  return ret;
+};
+
+export const sliceStr = (str, length) => {
+  var ret = "";
+
+  if (str) {
+    if (str.length > length) {
+      ret = str.slice(0, 20) + "...";
+    } else {
+      ret = str;
+    }
+  }
+
+  return ret;
 };
