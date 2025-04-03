@@ -2,7 +2,7 @@ import moment from "moment-timezone";
 import MarkedPlace from "../pages/post/MarkedPlace";
 import ReactDOMServer from "react-dom/server";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 const place = new window.kakao.maps.services.Places();
 const geocoder = new window.kakao.maps.services.Geocoder();
 const serverUrl = process.env.REACT_APP_SERVER_API;
@@ -24,6 +24,54 @@ export const changeDateStr = (year, month, date) => {
     String(month).padStart(2, "0") +
     String(date).padStart(2, "0")
   );
+};
+
+export const pageAndDate = async (page, date, defaultDay) => {
+  const now = new Date();
+  const nowDay = now.getDate();
+  const tempDate = new Date(
+    date.substring(0, 4),
+    date.substring(4, 6) - 1,
+    date.substring(6, 8)
+  );
+  let start;
+  if (nowDay < defaultDay) {
+    start = new Date(now.getFullYear(), now.getMonth() - page, defaultDay);
+  } else {
+    start = new Date(
+      now.getFullYear(),
+      now.getMonth() - (page - 1),
+      defaultDay
+    );
+  }
+  const end = new Date(
+    start.getFullYear(),
+    start.getMonth() + 1,
+    defaultDay - 1
+  );
+  if (start <= tempDate && tempDate <= end) {
+    return true;
+  } else {
+    return false;
+  }
+};
+//yyyy-mm-dd
+export const changeStr_date_yyyymmdd = (date) => {
+  return (
+    date.substring(0, 4) +
+    "-" +
+    date.substring(4, 6) +
+    "-" +
+    date.substring(6, 8)
+  );
+};
+//yyyy-mm
+export const changeStr_date_yyyymm = (date) => {
+  return date.substring(0, 4) + "-" + date.substring(4, 6);
+};
+//mm-dd
+export const changeStr_date_mmdd = (date) => {
+  return date.substring(4, 6) + "-" + date.substring(6, 8);
 };
 
 export const kakaoSearchKeyword = (search, count) => {
@@ -281,6 +329,32 @@ export const getFile = (filepath) => {
   return serverUrl + convFilepath;
 };
 
+export const moneyToStr = (value) => {
+  var nums = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  var units = ["", "만", "억", "조"];
+  var ret = "";
+  if (value) {
+    const str = String(value);
+
+    if (str.length > 0) {
+      for (let i = 0; i < str.length; i++) {
+        const tmpNum = Number(str[i]);
+        if (str.length - i - 1 >= 4) {
+          if ((str.length - i - 1) % 4 === 0) {
+            ret = ret + nums[tmpNum] + units[(str.length - i - 1) / 4] + " ";
+          } else {
+            ret = ret + nums[tmpNum];
+          }
+        } else {
+          ret = ret + nums[tmpNum];
+        }
+      }
+    }
+  }
+
+  return ret;
+};
+
 export const getPeriod = (defaultDay, select, selectedMonth) => {
   const today = new Date();
   const todayDate = today.getDate();
@@ -327,4 +401,33 @@ export const getPeriod = (defaultDay, select, selectedMonth) => {
     period: `${startDate} ~ ${endDate}`, // 기존 결과
     startDateRaw, // startDateRaw도 함께 반환!
   };
+};
+
+export const objToStr = (obj, key, value) => {
+  var ret = "";
+  if (obj && Object.keys(obj).length > 0) {
+    if (Object.keys(obj).includes(key)) {
+      ret = obj[key];
+    } else {
+      ret = value;
+    }
+  } else {
+    ret = value;
+  }
+
+  return ret;
+};
+
+export const sliceStr = (str, length) => {
+  var ret = "";
+
+  if (str) {
+    if (str.length > length) {
+      ret = str.slice(0, 20) + "...";
+    } else {
+      ret = str;
+    }
+  }
+
+  return ret;
 };

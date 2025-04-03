@@ -511,7 +511,6 @@ export const setProfile = createAsyncThunk(
         {
           headers: {
             Authorization: cookie.get("jwtToken"),
-            "Content-Type": "multipart/form-data",
           },
         }
       );

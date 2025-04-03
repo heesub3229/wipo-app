@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
 import {
   LineChart,
   Line,
@@ -10,68 +11,54 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import {
+  afterSelectDay,
+  afterSelectMonth,
+  beforeSelectDay,
+  beforeSelectMonth,
+} from "../../slices/rcpt";
+import {
+  changeStr_date_mmdd,
+  changeStr_date_yyyymm,
+  changeStr_date_yyyymmdd,
+} from "../../components/Util";
 
-export default function LedgerChart({ data, type }) {
-  const [startIndex, setStartIndex] = useState(
-    type === "M" ? data.length - 6 : data.length - 7
+export default function LedgerChart({ type }) {
+  const dispatch = useDispatch();
+  const rcptGraphMonth = useSelector((state) => state.rcpt.rcptGraph_month);
+  const rcptGraphDay = useSelector((state) => state.rcpt.rcptGraph_day);
+  const rcptStateSelect = useSelector((state) => state.rcpt.select);
+  const data = useMemo(
+    () => (type === "M" ? rcptGraphMonth : rcptGraphDay),
+    [type, rcptGraphMonth, rcptGraphDay]
   );
-  const [endIndex, setEndIndex] = useState(data.length - 1);
 
   const handleNext = () => {
     if (type === "M") {
-      if (endIndex < data.length - 1) {
-        setStartIndex((prev) => prev + 6);
-        setEndIndex((prev) => prev + 6);
-      }
+      dispatch(afterSelectMonth());
     }
 
     if (type === "D") {
-      if (endIndex < data.length - 1) {
-        setStartIndex((prev) => prev + 7);
-        setEndIndex((prev) => prev + 7);
-      }
+      dispatch(afterSelectDay());
     }
   };
 
   const handlePrev = () => {
     if (type === "M") {
-      if (startIndex > 0) {
-        setStartIndex((prev) => prev - 6);
-        setEndIndex((prev) => prev - 6);
-      }
+      dispatch(beforeSelectMonth());
     }
 
     if (type === "D") {
-      if (startIndex > 0) {
-        setStartIndex((prev) => prev - 7);
-        setEndIndex((prev) => prev - 7);
-      }
+      dispatch(beforeSelectDay());
     }
-  };
-
-  const getDisplayedData = () => {
-    if (startIndex < 0) {
-      const missingCount = Math.abs(startIndex);
-      const paddedData = Array.from({ length: missingCount }, (_, i) => ({
-        name: "",
-        expense: null, // 이전 데이터는 null로 설정
-        income: null,
-      })).concat(data.slice(0, endIndex + 1));
-      return paddedData;
-    }
-    return data.slice(startIndex, endIndex + 1);
   };
 
   return (
     <div className="h-full">
       <div className="flex justify-between mb-4">
         <div
-          className={`flex items-center font-bold px-2 rounded-md space-x-2 select-none ${
-            startIndex <= 0
-              ? "text-gray-400 cursor-default"
-              : "text-indigo-500 cursor-pointer hover:bg-gray-200"
-          }`}
-          onClick={startIndex > 0 ? handlePrev : undefined}
+          className={`flex items-center font-bold px-2 rounded-md space-x-2 select-none ${"text-indigo-500 cursor-pointer hover:bg-gray-200"}`}
+          onClick={handlePrev}
         >
           <FaAngleLeft />
           <p>이전</p>
@@ -81,32 +68,45 @@ export default function LedgerChart({ data, type }) {
         </p>
         <div
           className={`flex items-center font-bold px-2 rounded-md space-x-2 select-none ${
-            endIndex >= data.length - 1
+            (
+              type === "M"
+                ? rcptStateSelect.monthSelect === 1
+                : rcptStateSelect.daySelect === 1
+            )
               ? "text-gray-400 cursor-default"
               : "text-indigo-500 cursor-pointer hover:bg-gray-200"
           }`}
-          onClick={endIndex < data.length - 1 ? handleNext : undefined}
+          onClick={
+            (
+              type === "M"
+                ? rcptStateSelect.monthSelect > 1
+                : rcptStateSelect.daySelect > 1
+            )
+              ? handleNext
+              : undefined
+          }
         >
           <p>다음</p>
           <FaAngleRight />
         </div>
       </div>
       <ResponsiveContainer width="100%" height="75%">
-        <LineChart
-          data={getDisplayedData()}
-          margin={{ top: 10, left: 40, right: 40 }}
-        >
+        <LineChart data={data} margin={{ top: 10, left: 40, right: 40 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
-            dataKey="name"
+            dataKey="date"
             tickFormatter={(value) =>
-              type === "M" ? `${value}월` : `${value}일`
+              type === "M"
+                ? `${changeStr_date_yyyymm(value)}월`
+                : `${changeStr_date_mmdd(value)}일`
             }
           />
           <YAxis />
           <Tooltip
             labelFormatter={(label) =>
-              type === "M" ? `${label}월` : `${label}일`
+              type === "M"
+                ? `${changeStr_date_yyyymm(label)}월`
+                : `${changeStr_date_yyyymmdd(label)}일`
             }
           />
           <Legend wrapperStyle={{ fontWeight: "bold" }} />

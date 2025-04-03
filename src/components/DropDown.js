@@ -552,7 +552,9 @@ export const LedgerCategory = ({ title, value, list, setData }) => {
       >
         <input
           className="w-full bg-gray-50 focus:outline-none text-center"
-          value={value}
+          value={
+            list && value ? list.find((item) => item.code === value).name : ""
+          }
           onClick={() => handleOpen()}
           readOnly
         />

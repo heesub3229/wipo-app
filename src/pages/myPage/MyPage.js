@@ -9,7 +9,7 @@ import {
   FaPaintbrush,
   FaWonSign,
 } from "react-icons/fa6";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { UnderLineDateInput, UnderLineInput } from "../../components/TextField";
 import { formatDate } from "../../components/Common";
 import { CancelBtn } from "../../components/Buttons";
@@ -28,7 +28,9 @@ export default function MyPage({ userInfo, onClose }) {
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [date, setDate] = useState("");
-  const [defaultDay, setDefaultDay] = useState(1);
+  const [defaultDay, setDefaultDay] = useState(
+    useSelector((state) => state.auth.defaultDay)
+  );
   const [color, setColor] = useState(userInfo.profileColor || "Purple");
   const [showPalette, setShowPalette] = useState(false);
   const [onOffPalette, setOnOffPalette] = useState(false);
@@ -121,8 +123,9 @@ export default function MyPage({ userInfo, onClose }) {
       formData.append("image", image);
     }
     if (defaultDay) {
-      formData.append("defaultDay", defaultDay);
+      formData.append("defaultDay", String(defaultDay));
     }
+
     const res = await dispatch(setProfile(formData));
     if (res) {
       const { data, status } = res.payload;

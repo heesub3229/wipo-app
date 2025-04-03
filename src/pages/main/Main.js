@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { getOtherPost, getPostMy } from "../../api/PostApi";
 import { Cookies } from "react-cookie";
 import Postings from "../posting/Postings";
+import { saveUser } from "../../components/LoginIng";
 
 export default function Main() {
   const dispatch = useDispatch();
@@ -16,6 +17,7 @@ export default function Main() {
   useEffect(() => {
     const cookie = new Cookies();
     if (cookie.get("jwtToken")) {
+      dispatch(saveUser());
       if (postState_i && postState_i.length > 0) {
       } else {
         dispatch(getPostMy(0));

@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 
-function StarRating() {
+function StarRating({ value, handleClick }) {
   const [score, setScore] = useState(0);
-  const [scoreFixed, setScoreFixed] = useState(score);
+
+  useEffect(() => {
+    if (value) {
+      console.log(value);
+      setScore(value);
+    }
+  }, [value]);
 
   const handleLeftHalfEnter = (idx) => {
     setScore(idx + 0.5);
@@ -14,17 +20,17 @@ function StarRating() {
   };
 
   const handleStarClick = () => {
-    setScoreFixed(score);
+    handleClick(score);
   };
 
   const handleStarLeave = () => {
-    if (score !== scoreFixed) {
-      setScore(scoreFixed);
+    if (score !== value) {
+      setScore(value);
     }
   };
 
   return (
-    <div className="flex space-x-1">
+    <div className="flex space-x-1.5 pt-3 justify-center">
       {Array(5)
         .fill(0)
         .map((_, idx) => (

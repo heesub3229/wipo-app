@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { moneyToStr, sliceStr } from "./Util";
 
 export const LoginInput = React.memo(
   function LoginInput({
@@ -338,13 +339,58 @@ export const LedgerInput = ({ title, value, handleInputChange }) => {
   );
 };
 
+export const LedgerInputFile = ({ title, value, handleInputChange }) => {
+  const fileInputRef = useRef(null);
+  const handleTriggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  return (
+    <div className="py-2">
+      <p className="font-bold text-indigo-500 ml-1 mb-2">{title}</p>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(event) => handleInputChange(event.target.files[0])}
+        className="hidden"
+        ref={fileInputRef}
+      />
+
+      <div className="flex">
+        <div
+          className={`flex items-center bg-gray-50 w-full p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none`}
+        >
+          <div
+            onClick={handleTriggerFileInput}
+            className="cursor-pointer focus:outline-none w-full text-center"
+          >
+            {value ? sliceStr(value.name, 20) : "파일을 선택해주세요"}
+          </div>
+        </div>
+        <div
+          className={`flex basis-32 ml-5 items-center bg-gray-50 w-full p-3 border rounded-md ring-gray-600 focus-within:ring-2 focus-within:ring-gray-500 focus-within:border-none`}
+        >
+          <div
+            onClick={(event) => handleInputChange(null)}
+            className="cursor-pointer focus:outline-none w-full text-center "
+          >
+            삭제
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const LedgerAmount = ({ title, value, handleInputChange }) => {
   const formatNumber = (num) => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
   const handleChange = (e) => {
-    const inputValue = e.target.value.replace(/,/g, "");
+    const inputValue = e.target.value.replace(/[^0-9]/g, "");
     if (!isNaN(inputValue) && inputValue !== "") {
       handleInputChange(inputValue);
     } else if (inputValue === "") {
@@ -364,6 +410,14 @@ export const LedgerAmount = ({ title, value, handleInputChange }) => {
           onChange={handleChange}
         />
         <p className="ml-2">원</p>
+      </div>
+      <div className="flex pr-3 pt-1">
+        <input
+          value={moneyToStr(value)}
+          disabled={true}
+          className="w-full text-sm text-right focus:outline-none focus:none bg-white"
+        />
+        <p className="ml-1">원</p>
       </div>
     </div>
   );

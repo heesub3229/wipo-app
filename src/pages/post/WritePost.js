@@ -88,7 +88,6 @@ export default function WritePost() {
           item.sid === null || (item.sid !== null && item.favFlag === "N")
       );
       if (filterData && filterData.length > 0) {
-        console.log("작동");
         const filterformData = authStateFavList.data.filter(
           (item) => !(item.sid === null && item.favFlag === "N")
         );

@@ -1,36 +1,70 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { LedgerInput, TitleInput } from "../../components/TextField";
 import {
-  FaRegCalendar,
-  FaLocationDot,
-  FaMagnifyingGlass,
-  FaTags,
-} from "react-icons/fa6";
+  LedgerInput,
+  LedgerInputFile,
+  TitleInput,
+} from "../../components/TextField";
+import { FaMagnifyingGlass } from "react-icons/fa6";
 import { LedgerCategory, LocationDropDown } from "../../components/DropDown";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getSearchedPlaces } from "../../api/PlaceApi";
 import {
   kakaoNextPage,
   kakaoSearchAddress,
   kakaoSearchKeyword,
+  objToStr,
 } from "../../components/Util";
-import { changeFavPage, pushFavList } from "../../slices/auth";
-import LocationPage from "../post/LocationPage";
 import PopRestPage from "./PopRestPage";
 import StarRating from "./StarRating";
-import { LedgerCancel, LedgerSave } from "../../components/Buttons";
+import {
+  LedgerBtnBg,
+  LedgerBtnNoBg,
+  LedgerCancel,
+  LedgerSave,
+} from "../../components/Buttons";
+import KakaoMap from "../../components/KakaoMap";
+
+const categoryData = [
+  { code: "A", name: "패스트푸드" },
+  { code: "B", name: "카페.디저트" },
+  { code: "C", name: "치킨" },
+  { code: "D", name: "피자" },
+  { code: "E", name: "돈까스.회" },
+  { code: "F", name: "찜.탕" },
+  { code: "G", name: "중식" },
+  { code: "H", name: "분식" },
+  { code: "I", name: "분식" },
+  { code: "J", name: "고기" },
+  { code: "K", name: "양식" },
+  { code: "L", name: "족발.보쌈" },
+  { code: "M", name: "아시안" },
+  { code: "N", name: "야식" },
+  { code: "O", name: "도시락" },
+];
+
+const initFormData = {
+  name: "",
+  address: "",
+  menu: "",
+  category: "",
+  remark: "",
+  file: null,
+  rating: 0,
+};
+
+const initLocationList = {
+  page: null,
+  data: null,
+};
 
 export default function PopRestModal({ data, onClose }) {
-  const authStateFavList = useSelector((state) => state.auth.favList);
   const [location, setLocation] = useState("");
   const [autoList, setAutoList] = useState([]);
-  const [locationList, setLocationList] = useState({
-    page: authStateFavList.page,
-    data: authStateFavList.data,
-  });
+  const [locationList, setLocationList] = useState(initLocationList);
   const [selectedData, setSelectedData] = useState("");
   const [selectedLocation, setSelectedLocation] = useState({});
-  const dispatch = useDispatch();
+  const [step, setStep] = useState(1);
+  const [formData, setFromData] = useState(initFormData);
 
   useEffect(() => {
     const debounceTimeout = setTimeout(() => {
@@ -63,7 +97,7 @@ export default function PopRestModal({ data, onClose }) {
 
   const searchProc = async (value) => {
     if (value) {
-      setLocationList({}); // 기존 데이터 초기화
+      setLocationList(initLocationList); // 기존 데이터 초기화
       debouncedAddress(value, (addrData) => {
         debouncedSearch(
           { value: value, count: addrData.page.totalCount },
@@ -94,26 +128,12 @@ export default function PopRestModal({ data, onClose }) {
               mergeData.data.push(emptyData);
             }
 
-            mergeData.data.forEach((item) => {
-              const findItem = authStateFavList.data.find(
-                (itemB) =>
-                  Number(itemB.x) === Number(item.x) &&
-                  Number(itemB.y) === Number(item.y)
-              );
-              if (findItem) {
-                item.favFlag = findItem.favFlag;
-              }
-            });
-
             setLocationList(mergeData);
           }
         );
       });
     } else {
-      setLocationList({
-        data: authStateFavList.data,
-        page: authStateFavList.page,
-      });
+      setLocationList(initLocationList);
     }
   };
 
@@ -135,6 +155,13 @@ export default function PopRestModal({ data, onClose }) {
 
   const selectLocation = (value) => {
     if (value) {
+      if (Object.keys(value).includes("placeName")) {
+        setLocation(value.placeName);
+        setFromData((item) => ({ ...item, name: value.placeName }));
+      }
+      if (Object.keys(value).includes("addressName")) {
+        setFromData((item) => ({ ...item, address: value.addressName }));
+      }
       setSelectedLocation(value);
     }
   };
@@ -158,16 +185,7 @@ export default function PopRestModal({ data, onClose }) {
                 indexA === indexB + filterData.length + (value - 1) * 10
             );
             if (mergeData) {
-              const findFavData = authStateFavList.data.find(
-                (itemC) =>
-                  Number(itemC.x) === Number(mergeData.x) &&
-                  Number(itemC.y) === Number(mergeData.y)
-              );
-              if (findFavData) {
-                return { ...mergeData, favFlag: findFavData.favFlag };
-              } else {
-                return mergeData;
-              }
+              return mergeData;
             } else {
               return item;
             }
@@ -178,81 +196,153 @@ export default function PopRestModal({ data, onClose }) {
           }));
         }
       }
+    }
+  };
+
+  const fileUp = (value) => {
+    if (value) {
+      setFromData((item) => ({ ...item, file: value }));
     } else {
-      dispatch(changeFavPage(value));
+      setFromData((item) => ({ ...item, file: null }));
     }
   };
 
-  const clickFag = (value) => {
-    if (locationList) {
-      const { data, page } = locationList;
-      if (data) {
-        const findData = data.find(
-          (item) => item.x === value.x && item.y === value.y
-        );
-        if (findData) {
-          const addData = {
-            ...findData,
-            favFlag: findData.favFlag === "Y" ? "N" : "Y",
-          };
-
-          dispatch(pushFavList(addData));
-
-          const filterData = data.map((item) => {
-            if (item.x === value.x && item.y === value.y) {
-              return { ...item, favFlag: item.favFlag === "Y" ? "N" : "Y" };
-            } else {
-              return item;
-            }
-          });
-          setSelectedLocation(addData);
-          setLocationList({ data: filterData, page: page });
-        }
-      }
-    }
+  const saveClick = () => {
+    console.log(formData);
   };
-
-  console.log(locationList);
 
   return (
-    <div className="relative w-[500px] h-[680px] bg-white mt-5 shadow-md rounded-md p-12">
-      <div className="h-[10%]">
-        <LocationDropDown
-          endIcon={FaMagnifyingGlass}
-          placeholder="맛집 검색하기"
-          handleInputChange={handleLocationChange}
-          clickEndIcon={handleSearch}
-          list={autoList}
-          setData={setSelectedData}
-        />
-      </div>
-      <div className="py-2">
-        <p className="font-bold text-indigo-500 ml-1 mb-2">별점</p>
-        <StarRating />
-      </div>
-      <LedgerInput title="상호명" />
-      <LedgerInput title="주소" />
-      <div className="flex space-x-2">
-        <div className="flex-1">
-          <LedgerInput title="메뉴" />
+    <div className="relative grid p-10 overflow-hidden w-[500px] h-[680px] bg-white shadow-md rounded-md">
+      <div
+        className={`col-start-1 row-start-1 inset-0 transition-all duration-500 ${
+          step === 1
+            ? "opacity-100 translate-x-0"
+            : "opacity-0 -translate-x-full"
+        }
+        `}
+      >
+        <div className="h-[8%]">
+          <LocationDropDown
+            value={location}
+            endIcon={FaMagnifyingGlass}
+            placeholder="맛집 검색하기"
+            handleInputChange={handleLocationChange}
+            clickEndIcon={handleSearch}
+            list={autoList}
+            setData={setSelectedData}
+          />
         </div>
-        <div className="flex-1">
-          <LedgerCategory title="분류" />
+        <div className="mt-1 justify-items-center w-full">
+          <KakaoMap
+            className="border w-[20vw] h-[27vh]"
+            selectLoc={selectedLocation}
+          />
+        </div>
+        <div className="w-full mt-1 h-[27vh] flex space-x-3 relative justify-center">
+          <div className="border w-full flex flex-col">
+            <PopRestPage
+              locationList={locationList}
+              setData={selectLocation}
+              nextClick={changePage}
+            />
+          </div>
+        </div>
+        <div className="absolute flex space-x-2 bottom-1 right-1">
+          <LedgerBtnBg
+            text={"다음"}
+            handleClick={() => {
+              setStep(2);
+            }}
+          />
+          <LedgerCancel handleClick={() => onClose()} />
         </div>
       </div>
-      <LedgerInput title="한 줄 평" />
+      <div
+        className={`col-start-1 row-start-1 inset-0 transition-all duration-500  ${
+          step === 2
+            ? "opacity-100 translate-x-0"
+            : "opacity-0 translate-x-full"
+        }`}
+      >
+        <div className="flex space-x-2">
+          <div className="flex-1">
+            <LedgerInput
+              title="상호명"
+              value={objToStr(formData, "name", "")}
+              handleInputChange={(value) => {
+                setFromData((item) => ({ ...item, name: value }));
+              }}
+            />
+          </div>
+          <div className="flex-1 ">
+            <div className="py-2">
+              <p className="font-bold text-indigo-500 ml-1 mb-2">별점</p>
+              <StarRating
+                value={formData.rating}
+                handleClick={(value) => {
+                  setFromData((item) => ({ ...item, rating: value }));
+                }}
+              />
+            </div>
+          </div>
+        </div>
 
-      <div className="h-[90%]">
-        <PopRestPage
-          locationList={locationList}
-          setLocationList={clickFag}
-          setData={selectLocation}
-          nextClick={changePage}
+        <LedgerInput
+          title="주소"
+          value={objToStr(formData, "address", "")}
+          handleInputChange={(value) => {
+            setFromData((item) => ({ ...item, address: value }));
+          }}
         />
-      </div>
-      <div className="absolute flex space-x-2 bottom-10 right-10">
-        <LedgerSave />
-        <LedgerCancel handleClick={() => onClose()} />
+        <div className="flex space-x-2">
+          <div className="flex-1">
+            <LedgerInput
+              title="메뉴"
+              value={objToStr(formData, "menu", "")}
+              handleInputChange={(value) => {
+                setFromData((item) => ({ ...item, menu: value }));
+              }}
+            />
+          </div>
+          <div className="flex-1">
+            <LedgerCategory
+              title="분류"
+              value={objToStr(formData, "category", "")}
+              list={categoryData}
+              setData={(value) => {
+                setFromData((item) => ({ ...item, category: value }));
+              }}
+            />
+          </div>
+        </div>
+        <LedgerInput
+          title="한 줄 평"
+          value={objToStr(formData, "remark", "")}
+          handleInputChange={(value) =>
+            setFromData((item) => ({ ...item, remark: value }))
+          }
+        />
+        <LedgerInputFile
+          title={"사진업로드"}
+          value={objToStr(formData, "file", null)}
+          handleInputChange={(event) => fileUp(event)}
+        />
+
+        <div className="absolute flex space-x-2 bottom-1 right-1">
+          <LedgerBtnNoBg
+            text={"이전"}
+            handleClick={() => {
+              setStep(1);
+              setSelectedLocation({});
+              setSelectedData("");
+              setLocation("");
+              setFromData(initFormData);
+              setLocationList(initLocationList);
+            }}
+          />
+          <LedgerSave handleClick={() => saveClick()} />
+          <LedgerCancel handleClick={() => onClose()} />
+        </div>
       </div>
     </div>
   );
