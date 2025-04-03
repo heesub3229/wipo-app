@@ -140,6 +140,11 @@ export default function Alert({ isClosing, onClose }) {
                 </div>
               ))}
             </div>
+            <div className="w-full flex justify-center text-base ">
+              {filteredList.length === 0 && (
+                <p className="my-5">알림이 없습니다.</p>
+              )}
+            </div>
             {filteredList.map((item) => (
               <div
                 className="relative"

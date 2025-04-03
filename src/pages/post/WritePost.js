@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa6";
 import FileUpload from "./FileUpload";
 import { FilledButton, OutlinedButton } from "../../components/Buttons";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Modal } from "../../components/Modal";
 import SelectLocation from "./SelectLocation";
 import { UserSelect } from "../../components/DropDown";
@@ -33,6 +33,15 @@ export default function WritePost() {
   const dispatch = useDispatch();
   const authStateFriend = useSelector((state) => state.auth.friend || []);
   const authStateFavList = useSelector((state) => state.auth.favList);
+  const location = useLocation();
+  const { sentDate } = location.state || {};
+
+  useEffect(() => {
+    if (sentDate) {
+      setDate(sentDate);
+    }
+  }, [sentDate]);
+
   const handleOpenDatePicker = () => {
     if (!openDatePicker) {
       setOpenDatePicker(true);

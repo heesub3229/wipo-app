@@ -103,7 +103,7 @@ export default function Header() {
           </div>
         ) : (
           <img
-            className="w-8 h-8 rounded-full  justify-center items-center cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white justify-center items-center cursor-pointer"
             src={getFile(userInfo.file.filepath)}
             onClick={() => handleProfileClick()}
             alt="profile"

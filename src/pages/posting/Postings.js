@@ -15,6 +15,7 @@ import Profile from "../myPage/Profile";
 import { getFile } from "../../components/Util";
 import { async } from "q";
 import { getOtherPost, getPostMy } from "../../api/PostApi";
+import { useNavigate } from "react-router-dom";
 
 export default function Postings() {
   const [ref, inView] = useInView({});
@@ -22,24 +23,25 @@ export default function Postings() {
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [showMyPosts, setShowMyPosts] = useState(false);
+  const [friendsPost, setFriendsPost] = useState(false);
   const [selectedProfileSid, setSelectedProfileSid] = useState(null);
+  const navigator = useNavigate();
   const dispatch = useDispatch();
 
   const postState = useSelector((state) => state.post);
 
   useEffect(() => {
     if (postState) {
-      if (showMyPosts) {
+      if (friendsPost) {
         setPostData(postState.post_other);
       } else {
         setPostData(postState.post_i);
       }
     }
-  }, [showMyPosts, postState]);
+  }, [friendsPost, postState]);
 
   const handleToggle = () => {
-    setShowMyPosts((prev) => !prev);
+    setFriendsPost((prev) => !prev);
   };
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export default function Postings() {
   const loadMoreData = async () => {
     if (postData.length > 0 && postData.length % 10 > 0) {
       setLoading(true);
-      if (showMyPosts) {
+      if (friendsPost) {
         if (postState.iPage) {
           const res = await dispatch(getOtherPost(postState.otherPage));
           if (res) {
@@ -93,8 +95,8 @@ export default function Postings() {
   };
 
   const truncateText = (text) => {
-    if (text.length > 3) {
-      return text.slice(0, 3) + " ...";
+    if (text.length > 500) {
+      return text.slice(0, 500) + " ...";
     }
     return text;
   };
@@ -112,14 +114,14 @@ export default function Postings() {
       <>
         {!fileArray?.filepath ? (
           <div
-            className="w-14 h-14 rounded-full bg-gray-100 hover:bg-gray-100 flex justify-center items-center text-2xl text-gray-500 cursor-pointer"
+            className="w-14 h-14 rounded-full bg-gray-100 flex justify-center items-center text-2xl text-gray-500 cursor-pointer"
             onClick={handleProfileClick}
           >
             <FaUser />
           </div>
         ) : (
           <img
-            className="w-14 h-14 rounded-full cursor-pointer"
+            className="w-14 h-14 bg-gray-50 rounded-full cursor-pointer"
             src={getFile(fileArray?.filepath)}
             alt="profile"
             onClick={handleProfileClick}
@@ -133,15 +135,32 @@ export default function Postings() {
     setSelectedProfileSid(null);
   };
 
+  const handleWritePost = () => {
+    navigator("/WritePost");
+  };
+
   return (
     <>
-      <div className="mb-3 w-full flex justify-end items-center">
-        <p className="mr-2 font-bold">내 게시물만 보기</p>
-        <ToggleBtn isOn={showMyPosts} handleToggle={handleToggle} />
-      </div>
+      {postData.length !== 0 ? (
+        <div className="mb-3 w-full flex justify-end items-center">
+          <p className="mr-2 font-bold">친구 게시물 보기</p>
+          <ToggleBtn isOn={friendsPost} handleToggle={handleToggle} />
+        </div>
+      ) : (
+        <div className="flex flex-col justify-center items-center h-full text-lg select-none">
+          <p>등록된 게시물이 없습니다</p>
+          <p>WiPo에서 소중한 추억을 기록해보세요 :)</p>
+          <p
+            className="font-bold text-indigo-500 mt-5 cursor-pointer hover:text-indigo-700"
+            onClick={() => handleWritePost()}
+          >
+            게시물 등록하러 가기
+          </p>
+        </div>
+      )}
       {postData &&
         postData.map((item, index) => {
-          const contentLimit = 3;
+          const contentLimit = 500;
           const isOverflow = item.post?.content.length > contentLimit;
 
           return (

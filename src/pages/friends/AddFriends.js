@@ -11,6 +11,7 @@ import Profile from "../myPage/Profile";
 import { useDispatch } from "react-redux";
 import { getFindByUser } from "../../api/UserApi";
 import { Cookies } from "react-cookie";
+import { getFile } from "../../components/Util";
 
 export default function AddFriends({ isOpen, setIsOpen }) {
   const [searchFriend, setSearchFriend] = useState("");
@@ -135,9 +136,17 @@ export default function AddFriends({ isOpen, setIsOpen }) {
                   className="h-auto flex p-2 space-x-4 hover:bg-gray-200 select-none"
                   onClick={() => handleProfileClick(item.sid)}
                 >
-                  <div className="w-11 h-11 rounded-full bg-gray-100 flex justify-center items-center text-xl text-gray-500">
-                    <FaUser />
-                  </div>
+                  {!item.file?.filepath ? (
+                    <div className="w-11 h-11 rounded-full bg-gray-100 hover:bg-gray-100 flex justify-center items-center text-xl text-gray-500">
+                      <FaUser />
+                    </div>
+                  ) : (
+                    <img
+                      className="w-11 h-11 bg-white rounded-full flex justify-center items-center "
+                      src={getFile(item.file?.filepath)}
+                      alt="Profile"
+                    />
+                  )}
                   <div className="flex flex-col">
                     <p className="font-bold">{item.name}</p>
                     <p className="text-sm">{item.email}</p>

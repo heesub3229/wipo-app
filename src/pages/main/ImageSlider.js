@@ -41,12 +41,12 @@ export default function ImageSlider({ images }) {
   if (!images) return <></>;
   return (
     <div
-      className="w-35vw h-50vh border border-dotted rounded-md mx-auto overflow-hidden relative bg-white"
+      className="w-full h-full border border-dotted rounded-md mx-auto overflow-hidden relative bg-white"
       onMouseLeave={handleMouseUp}
     >
       <div
         ref={sliderRef}
-        className="flex transition-transform duration-300 ease-in-out"
+        className="flex transition-transform duration-300 ease-in-out w-full h-full"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -57,7 +57,7 @@ export default function ImageSlider({ images }) {
         {images.map((image, index) => (
           <div
             key={index}
-            className="flex-shrink-0 w-35vw h-50vh" // 슬라이드 크기 설정
+            className="flex-shrink-0 w-full h-full " // 슬라이드 크기 설정
           >
             <img
               src={getFile(image.filepath)}
