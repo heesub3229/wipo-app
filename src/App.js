@@ -15,6 +15,7 @@ import WritePost from "./pages/post/WritePost";
 import { PutStream } from "./api/UserApi";
 import LedgerMain from "./pages/ledger/LedgerMain";
 import PopRestMain from "./pages/popRest/PopRestMain";
+import Calendar from "./pages/calendar/Calendar";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Route path="/Main" element={<Main />} />
           <Route path="/Ledger" element={<LedgerMain />} />
           <Route path="/PopRest" element={<PopRestMain />} />
+          <Route path="/Calendar" element={<Calendar />} />
         </Routes>
         <PutStream />
         <Loading />

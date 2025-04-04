@@ -1,12 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa6";
 import Header from "../main/Header";
 import PopRestList from "./PopRestList";
 import { Modal } from "../../components/Modal";
 import PopRestModal from "./PopRestModal";
+import { useDispatch } from "react-redux";
+import { getRestList } from "../../api/RestApi";
 
 export default function PopRestMain() {
   const [openModal, setOpenModal] = useState(false);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getRestList());
+  }, []);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -17,7 +24,7 @@ export default function PopRestMain() {
   return (
     <div className="min-h-screen w-screen bg-back flex justify-center items-center">
       <Header />
-      <div className="flex-grow flex justify-center items-center pt-10vh">
+      <div className="flex-grow flex justify-center items-center pt-7vh">
         <PopRestList />
       </div>
       <div

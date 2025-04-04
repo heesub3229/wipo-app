@@ -23,6 +23,8 @@ import {
   LedgerSave,
 } from "../../components/Buttons";
 import KakaoMap from "../../components/KakaoMap";
+import { restSave } from "../../api/RestApi";
+import { pushList } from "../../slices/rest";
 
 const categoryData = [
   { code: "A", name: "패스트푸드" },
@@ -32,7 +34,7 @@ const categoryData = [
   { code: "E", name: "돈까스.회" },
   { code: "F", name: "찜.탕" },
   { code: "G", name: "중식" },
-  { code: "H", name: "분식" },
+  { code: "H", name: "한식" },
   { code: "I", name: "분식" },
   { code: "J", name: "고기" },
   { code: "K", name: "양식" },
@@ -65,6 +67,7 @@ export default function PopRestModal({ data, onClose }) {
   const [selectedLocation, setSelectedLocation] = useState({});
   const [step, setStep] = useState(1);
   const [formData, setFromData] = useState(initFormData);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const debounceTimeout = setTimeout(() => {
@@ -207,8 +210,40 @@ export default function PopRestModal({ data, onClose }) {
     }
   };
 
-  const saveClick = () => {
-    console.log(formData);
+  const saveClick = async () => {
+    const saveData = new FormData();
+
+    const dto = {
+      restaurant: {
+        category: formData.category,
+        placeName: formData.address,
+        menuName: formData.menu,
+        memo: formData.remark,
+        rating: formData.rating,
+      },
+      map: selectedLocation,
+    };
+
+    saveData.append(
+      "data",
+      new Blob([JSON.stringify(dto)], { type: "application/json" })
+    );
+    saveData.append("file", formData.file);
+
+    const res = await dispatch(restSave(saveData));
+
+    if (res.payload) {
+      const { status } = res.payload;
+      if (status === 200) {
+        const { data, errFlag } = res.payload.data;
+        if (errFlag === false) {
+          const restRes = dispatch(pushList(data)).payload;
+          if (!restRes) {
+            onClose();
+          }
+        }
+      }
+    }
   };
 
   return (
